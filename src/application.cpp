@@ -127,11 +127,11 @@ void Application::render() {
   cube.draw();
 
   // Draw several objects loaded through the Mesh class
-  glUseProgram(draw_object_program);
+  /*glUseProgram(draw_object_program);
   for (auto &mesh : obj_test_scene) {
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, default_object_buffer);
     mesh->draw();
-  }
+  }*/
 
   // Draw lights using Instanced rendering
   glUseProgram(draw_lights_program);

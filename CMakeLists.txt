@@ -113,8 +113,8 @@ target_include_directories(final
 # You can use configure_file to copy all the files needed to run the application into the build folder.
 # That way you don't have to configure the IDE to run the program from inside the source folder.
 # configure_file("${CMAKE_CURRENT_SOURCE_DIR}/FILL_IN" "${CMAKE_CURRENT_BINARY_DIR}/FILL_IN" COPYONLY)
-#
-#[[
+
+
 set(SHADERS ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 set(SHADERS_BINARY ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 configure_file(${SHADERS}/draw_lights.vert ${SHADERS_BINARY}/draw_lights.vert COPYONLY)
@@ -134,4 +134,3 @@ set(OBJECTS ${CMAKE_CURRENT_SOURCE_DIR}/objects)
 set(OBJECTS_BINARY ${CMAKE_CURRENT_BINARY_DIR}/objects)
 configure_file(${OBJECTS}/test_scene.mtl ${OBJECTS_BINARY}/test_scene.mtl COPYONLY)
 configure_file(${OBJECTS}/test_scene.obj ${OBJECTS_BINARY}/test_scene.obj COPYONLY)
-]]
