@@ -18,10 +18,14 @@ Application::Application(size_t initial_width, size_t initial_height) {
   directional_light.specular_color = glm::vec4(1.0f);
   lights.push_back(directional_light);
 
-  default_object.model_matrix = glm::mat4(1.0f);
-  default_object.ambient_color = glm::vec4(0.0f);
-  default_object.diffuse_color = glm::vec4(1.0f);
-  default_object.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+  clock.model_matrix = glm::mat4(
+	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+	  glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
+	  glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+  clock.ambient_color = glm::vec4(0.0f);
+  clock.diffuse_color = glm::vec4(1.0f);
+  clock.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
   floor_object.model_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(8.0, 0.01f, 8.0f));
   floor_object.ambient_color = glm::vec4(0.0f);
@@ -50,8 +54,8 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &lights_buffer);
   glNamedBufferStorage(lights_buffer, lights.size() * sizeof(LightUBO), lights.data(), GL_DYNAMIC_STORAGE_BIT);
 
-  glCreateBuffers(1, &default_object_buffer);
-  glNamedBufferStorage(default_object_buffer, sizeof(ObjectUBO), &default_object, GL_DYNAMIC_STORAGE_BIT);
+  glCreateBuffers(1, &clock_buffer);
+  glNamedBufferStorage(clock_buffer, sizeof(ObjectUBO), &clock, GL_DYNAMIC_STORAGE_BIT);
 
   glCreateBuffers(1, &floor_object_buffer);
   glNamedBufferStorage(floor_object_buffer, sizeof(ObjectUBO), &floor_object, GL_DYNAMIC_STORAGE_BIT);
@@ -81,7 +85,7 @@ Application::~Application() {
 
   glDeleteBuffers(1, &lights_buffer);
   glDeleteBuffers(1, &floor_object_buffer);
-  glDeleteBuffers(1, &default_object_buffer);
+  glDeleteBuffers(1, &clock_buffer);
 
   glDeleteTextures(1, &default_texture);
 
@@ -132,6 +136,12 @@ void Application::render() {
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, default_object_buffer);
     mesh->draw();
   }*/
+
+  glUseProgram(draw_object_program);
+  for (auto &mesh : clock_scene) {
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer);
+    mesh->draw();
+  }
 
   // Draw lights using Instanced rendering
   glUseProgram(draw_lights_program);

@@ -96,12 +96,12 @@ private:
   Mesh sphere = Mesh::sphere();
   Mesh teapot = Mesh::teapot();
 
-  std::vector<std::unique_ptr<Mesh>> obj_test_scene = Mesh::from_file("objects/test_scene.obj");
-
+  //std::vector<std::unique_ptr<Mesh>> obj_test_scene = Mesh::from_file("objects/test_scene.obj");
+  std::vector<std::unique_ptr<Mesh>> clock_scene = Mesh::from_file("objects/clock.obj");
   // This is the default material that can be used when nothing else is.
   // You might want to create material UBOs and textures inside the Mesh class.
-  ObjectUBO default_object;
-  GLuint default_object_buffer = 0;
+  ObjectUBO clock;
+  GLuint clock_buffer = 0;
   GLuint default_texture = load_texture_2d("images/default.png");
 
   ObjectUBO floor_object;
