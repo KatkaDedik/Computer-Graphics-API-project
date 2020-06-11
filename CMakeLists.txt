@@ -136,3 +136,5 @@ configure_file(${OBJECTS}/test_scene.mtl ${OBJECTS_BINARY}/test_scene.mtl COPYON
 configure_file(${OBJECTS}/test_scene.obj ${OBJECTS_BINARY}/test_scene.obj COPYONLY)
 configure_file(${OBJECTS}/clock.obj ${OBJECTS_BINARY}/clock.obj COPYONLY)
 configure_file(${OBJECTS}/clock.mtl ${OBJECTS_BINARY}/clock.mtl COPYONLY)
+configure_file(${OBJECTS}/cube_man.obj ${OBJECTS_BINARY}/cube_man.obj COPYONLY)
+configure_file(${OBJECTS}/cube_man.mtl ${OBJECTS_BINARY}/cube_man.mtl COPYONLY)
