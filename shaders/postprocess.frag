@@ -35,12 +35,12 @@ void main() {
 
 	vec3 color = vec3(0.0);
 	const int size = 3;
-	for(int i = -size; i <= size; i++) {
-		for(int j = -size; j <= size; j++) {
-			color += gaussian_7x7[i + size][j + size] * texelFetch(input_image, ivec2(gl_FragCoord.xy) + ivec2(i, j), 0).rgb;
-		}
-	}
-
+	//for(int i = -size; i <= size; i++) {
+	//	for(int j = -size; j <= size; j++) {
+	//		color += gaussian_7x7[i + size][j + size] * texelFetch(input_image, ivec2(gl_FragCoord.xy) + ivec2(i, j), 0).rgb;
+	//	}
+	//}
+	color = texelFetch(input_image, ivec2(gl_FragCoord.xy), 0).rgb;
 	// https://en.wikipedia.org/wiki/Tone_mapping
 	// http://filmicworlds.com/blog/filmic-tonemapping-operators/
 	final_color = vec4(color / (color + 1.0), 1.0);	

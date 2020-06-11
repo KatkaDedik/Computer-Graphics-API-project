@@ -149,8 +149,8 @@ void Application::render() {
   glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera_buffer);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lights_buffer);
 
-  glBindVertexArray(sphere.get_vao());
-  glDrawElementsInstanced(sphere.get_mode(), sphere.get_indices_count(), GL_UNSIGNED_INT, nullptr, lights.size());
+  glBindVertexArray(teapot.get_vao());
+  glDrawElementsInstanced(teapot.get_mode(), teapot.get_indices_count(), GL_UNSIGNED_INT, nullptr, lights.size());
 
   // --------------------------------------------------------------------------
   // Apply post-process
