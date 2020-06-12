@@ -71,6 +71,7 @@ add_library(framework
 	"${FRAMEWORK_SRC_DIR}/rotate_camera.cpp"
 	"${FRAMEWORK_INCLUDE_DIR}/texture.hpp"
 	"${FRAMEWORK_SRC_DIR}/texture.cpp"
+	
 )
 add_dependencies(framework glfw glad)
 target_link_libraries(framework 
@@ -89,6 +90,7 @@ target_include_directories(framework
 add_executable(final
 	src/main.cpp 
 	src/application.cpp
+	src/audio.cpp
 )
 
 add_dependencies(final 
@@ -143,3 +145,7 @@ configure_file(${OBJECTS}/mdas.obj ${OBJECTS_BINARY}/mdas.obj COPYONLY)
 configure_file(${OBJECTS}/mdas.mtl ${OBJECTS_BINARY}/mdas.mtl COPYONLY)
 configure_file(${OBJECTS}/cover.jpg ${OBJECTS_BINARY}/cover.jpg COPYONLY)
 configure_file(${OBJECTS}/bookpages.jpg ${OBJECTS_BINARY}/bookpages.jpg COPYONLY)
+
+set(MUSIC ${CMAKE_CURRENT_SOURCE_DIR}/music)
+set(MUSIC_BINARY ${CMAKE_CURRENT_BINARY_DIR}/music)
+configure_file(${MUSIC}/Kahoot.mp3 ${MUSIC_BINARY}/Kahoot.mp3 COPYONLY)
