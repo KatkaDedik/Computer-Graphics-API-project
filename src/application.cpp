@@ -18,29 +18,30 @@ Application::Application(size_t initial_width, size_t initial_height) {
   directional_light.specular_color = glm::vec4(1.0f);
   lights.push_back(directional_light);
 
-  clock.model_matrix = glm::mat4(
-	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
-	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-	  glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
-	  glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-  clock.ambient_color = glm::vec4(0.0f);
-  clock.diffuse_color = glm::vec4(1.0f);
-  clock.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+  // clock
+  // fixing clock
+  std::swap(clock_mesh[6], clock_mesh[2]);
+  std::swap(clock_mesh[6], clock_mesh[3]);
+  std::swap(clock_mesh[6], clock_mesh[4]);
+  std::swap(clock_mesh[6], clock_mesh[5]);
 
-  cube_man.model_matrix = glm::mat4(
-	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
-	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
-	  glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
+  for (size_t i = 0; i < clock.size(); i++) {
+    clock[i].model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+                                      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    clock[i].ambient_color = glm::vec4(0.0f);
+    clock[i].diffuse_color = glm::vec4(1.0f);
+  }
+
+  clock[0].specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+
+  cube_man.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+                                    glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
   cube_man.ambient_color = glm::vec4(0.0f);
   cube_man.diffuse_color = glm::vec4(1.0f);
   cube_man.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-   mdas.model_matrix = glm::mat4(
-	   glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
-	   glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), 
-	   glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
-	   glm::vec4(-5.0f, 2.0f, 0.0f, 1.0f));
+  mdas.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
+                                glm::vec4(-5.0f, 2.0f, 0.0f, 1.0f));
   mdas.ambient_color = glm::vec4(0.0f);
   mdas.diffuse_color = glm::vec4(1.0f);
   mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
@@ -51,8 +52,8 @@ Application::Application(size_t initial_width, size_t initial_height) {
   floor_object.specular_color = glm::vec4(1.0f);
 
   // Scatter lights
-  for (int x = -8; x < 8; x += 2) {
-    for (int y = -8; y < 8; y += 2) {
+  for (int x = -10; x < 10; x += 2) {
+    for (int y = -10; y < 10; y += 2) {
       glm::vec3 color = (glm::vec3(x, y, 0.0f) + 8.0f) / 16.0f;
       lights.push_back({
           glm::vec4(x, 0.40f, y, 1.0f), // position
@@ -72,8 +73,10 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &lights_buffer);
   glNamedBufferStorage(lights_buffer, lights.size() * sizeof(LightUBO), lights.data(), GL_DYNAMIC_STORAGE_BIT);
 
-  glCreateBuffers(1, &clock_buffer);
-  glNamedBufferStorage(clock_buffer, sizeof(ObjectUBO), &clock, GL_DYNAMIC_STORAGE_BIT);
+  for (size_t i = 0; i < clock.size(); i++) {
+    glCreateBuffers(1, &clock_buffer[i]);
+    glNamedBufferStorage(clock_buffer[i], sizeof(ObjectUBO), &clock[i], GL_DYNAMIC_STORAGE_BIT);
+  }
 
   glCreateBuffers(1, &cube_man_buffer);
   glNamedBufferStorage(cube_man_buffer, sizeof(ObjectUBO), &cube_man, GL_DYNAMIC_STORAGE_BIT);
@@ -109,7 +112,7 @@ Application::~Application() {
 
   glDeleteBuffers(1, &lights_buffer);
   glDeleteBuffers(1, &floor_object_buffer);
-  glDeleteBuffers(1, &clock_buffer);
+  glDeleteBuffers(7, clock_buffer.data());
   glDeleteBuffers(1, &cube_man_buffer);
   glDeleteBuffers(1, &mdas_buffer);
 
@@ -124,6 +127,9 @@ Application::~Application() {
 }
 
 void Application::render() {
+
+  
+
   // --------------------------------------------------------------------------
   // Update data
   // --------------------------------------------------------------------------
@@ -164,9 +170,18 @@ void Application::render() {
   }*/
 
   glUseProgram(draw_object_program);
-  for (auto &mesh : clock_scene) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer);
-    mesh->draw();
+  y_position += direction;
+  if (y_position > 2.0f || y_position < 0.0f) {
+    direction = -direction;
+  }
+  float direction_rotation = 1.0f;
+    for (size_t i = 0; i < clock_mesh.size(); i++) {
+    direction_rotation = -direction_rotation;
+    clock[i].model_matrix = glm::rotate(clock[i].model_matrix, 0.005f + 0.005f * i * direction_rotation, glm::vec3(0.0f, 1.0f, 0.0f));
+    clock[i].model_matrix = glm::translate(clock[i].model_matrix, glm::vec3(0.0f, direction * i, 0.0f));
+	glNamedBufferSubData(clock_buffer[i], 0, sizeof(ObjectUBO), &clock[i]);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer[i]);
+    clock_mesh[i]->draw();
   }
 
   glUseProgram(draw_object_textured_program);
@@ -174,7 +189,6 @@ void Application::render() {
   glBindTextureUnit(0, cube_man_texture);
   cube_man_mesh.draw();
 
-  
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, mdas_buffer);
   glBindTextureUnit(0, mdas_cover_texture);
   mdas_mesh.draw();

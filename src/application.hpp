@@ -1,5 +1,7 @@
 #pragma once
 #include "audio.h"
+#include <array>
+#include <algorithm>
 
 // ----------------------------------------------------------------------------
 // LOW-LEVEL LIBRARIES
@@ -56,7 +58,7 @@ struct ObjectUBO {
 // ----------------------------------------------------------------------------
 class Application {
 
-	Audio music = Audio("music/Kahoot.mp3");
+  Audio music = Audio("music/Kahoot.mp3");
 
 public:
   Application(size_t initial_width, size_t initial_height);
@@ -106,10 +108,12 @@ private:
   // You might want to create material UBOs and textures inside the Mesh class.
 
   // orloj
-  std::vector<std::unique_ptr<Mesh>> clock_scene = Mesh::from_file("objects/clock.obj");
-  ObjectUBO clock;
-  GLuint clock_buffer = 0;
+  std::vector<std::unique_ptr<Mesh>> clock_mesh = Mesh::from_file("objects/clock.obj");
+  std::array<ObjectUBO, 7> clock;
+  std::array<GLuint, 7> clock_buffer = {0};
   GLuint default_texture = load_texture_2d("images/default.png");
+  float direction = 0.1f;
+  float y_position = 0.0f;
 
   // exekutor co berie pracku
   Mesh cube_man_mesh = *Mesh::from_file("objects/cube_man.obj")[0];

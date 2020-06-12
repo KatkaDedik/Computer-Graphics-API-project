@@ -1,10 +1,10 @@
 # 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
-# File Created: 11.06.2020 19:18:40
+# File Created: 13.06.2020 00:59:13
 
 mtllib clock.mtl
 
 #
-o dildo
+# object clock0
 #
 
 v  0.0000 0.2506 29.8835
@@ -310,8 +310,8 @@ vt 0.5486 0.2034 0.0000
 vt 0.3641 0.0000 0.0000
 # 165 texture coords
 
-o dildo
-g dildo
+o clock0
+g clock0
 usemtl 05___Default
 s 2
 f 1/1/1 2/2/2 3/3/3 4/4/4 
@@ -405,7 +405,7 @@ f 63/79/63 54/104/54 57/164/57
 # 60 polygons - 8 triangles
 
 #
-o dildo1
+# object clock1
 #
 
 v  -8.1207 57.5065 -30.3070
@@ -713,8 +713,8 @@ vt 0.2516 0.1891 0.8109
 vt 0.0000 1.0000 0.0000
 # 171 texture coords
 
-o dildo1
-g dildo1
+o clock1
+g clock1
 usemtl 05___Default
 s 1
 f 67/166/67 68/167/68 69/168/69 70/169/70 
@@ -807,7 +807,7 @@ f 130/336/130 120/273/120 122/272/122 128/280/128
 # 57 polygons - 10 triangles
 
 #
-o dildo3
+# object clock3
 #
 
 v  16.6567 156.2861 16.9722
@@ -1097,8 +1097,8 @@ vt 0.6534 0.0358 0.0000
 vt 0.6040 0.2813 0.0000
 # 165 texture coords
 
-o dildo3
-g dildo3
+o clock3
+g clock3
 usemtl 05___Default
 s 1
 f 131/337/131 132/338/132 133/339/133 134/340/134 
@@ -1173,7 +1173,7 @@ f 183/501/183 180/442/180 186/441/186 184/500/184
 # 54 polygons - 4 triangles
 
 #
-o dildo4
+# object clock4
 #
 
 v  23.1016 156.8785 6.1901
@@ -1414,8 +1414,8 @@ vt 0.2810 0.7186 0.0000
 vt 0.2267 0.6873 0.0000
 # 136 texture coords
 
-o dildo4
-g dildo4
+o clock4
+g clock4
 usemtl 05___Default
 s 2
 f 189/502/189 190/503/190 191/504/191 192/505/192 
@@ -1469,7 +1469,7 @@ f 234/594/234 225/597/225 223/637/223 221/636/221
 # 46 polygons
 
 #
-o dildo5
+# object clock5
 #
 
 v  14.0386 190.2085 3.7617
@@ -1780,8 +1780,8 @@ vt 0.3750 0.7415 0.2585
 vt 0.0000 0.5774 0.0000
 # 174 texture coords
 
-o dildo5
-g dildo5
+o clock5
+g clock5
 usemtl 05___Default
 s 1
 f 237/638/237 238/639/238 239/640/239 240/641/240 
@@ -1870,7 +1870,7 @@ f 298/753/298 292/752/292 293/811/293
 # 60 polygons - 4 triangles
 
 #
-o dildo6
+# object clock6
 #
 
 v  3.6372 205.0650 -0.9746
@@ -2177,8 +2177,8 @@ vt 0.4774 0.5072 0.0000
 vt 0.4163 0.5108 0.0000
 # 152 texture coords
 
-o dildo6
-g dildo6
+o clock6
+g clock6
 usemtl 05___Default
 s 1
 f 301/812/301 302/813/302 303/814/303 304/815/304 
@@ -2268,7 +2268,7 @@ f 369/963/369 370/941/370 373/940/373 368/962/368
 # 59 polygons - 24 triangles
 
 #
-o dildo2
+# object clock2
 #
 
 v  18.7766 129.1271 19.0924
@@ -2560,8 +2560,8 @@ vt 0.3721 0.1743 0.0000
 vt 0.3704 0.1737 0.0000
 # 161 texture coords
 
-o dildo2
-g dildo2
+o clock2
+g clock2
 usemtl 05___Default
 s 1
 f 374/964/374 375/965/375 376/966/376 377/967/377 
