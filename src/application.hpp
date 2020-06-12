@@ -97,17 +97,27 @@ private:
   Mesh teapot = Mesh::teapot();
 
   //std::vector<std::unique_ptr<Mesh>> obj_test_scene = Mesh::from_file("objects/test_scene.obj");
-  std::vector<std::unique_ptr<Mesh>> clock_scene = Mesh::from_file("objects/clock.obj");
-  Mesh cube_man_mesh = *Mesh::from_file("objects/cube_man.obj")[0];
+  
   // This is the default material that can be used when nothing else is.
   // You might want to create material UBOs and textures inside the Mesh class.
+  
+  //orloj
+  std::vector<std::unique_ptr<Mesh>> clock_scene = Mesh::from_file("objects/clock.obj");
   ObjectUBO clock;
   GLuint clock_buffer = 0;
   GLuint default_texture = load_texture_2d("images/default.png");
 
+  //exekutor co berie pracku
+  Mesh cube_man_mesh = *Mesh::from_file("objects/cube_man.obj")[0];
   ObjectUBO cube_man;
   GLuint cube_man_buffer = 0;
   GLuint cube_man_texture = load_texture_2d("object/Zeleznak.jpg");
+  
+  //matematika drsne a svizne
+  Mesh mdas_mesh = *Mesh::from_file("objects/mdas.obj")[0];
+  ObjectUBO mdas;
+  GLuint mdas_buffer = 0;
+  GLuint mdas_texture = load_texture_2d("object/Zeleznak.jpg");
 
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;

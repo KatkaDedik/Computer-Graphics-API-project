@@ -36,6 +36,15 @@ Application::Application(size_t initial_width, size_t initial_height) {
   cube_man.diffuse_color = glm::vec4(1.0f);
   cube_man.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
+   mdas.model_matrix = glm::mat4(
+	   glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
+	   glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), 
+	   glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
+	   glm::vec4(-5.0f, 2.0f, 0.0f, 1.0f));
+  mdas.ambient_color = glm::vec4(0.0f);
+  mdas.diffuse_color = glm::vec4(1.0f);
+  mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+
   floor_object.model_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(8.0, 0.01f, 8.0f));
   floor_object.ambient_color = glm::vec4(0.0f);
   floor_object.diffuse_color = glm::vec4(1.0f);
@@ -69,6 +78,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &cube_man_buffer);
   glNamedBufferStorage(cube_man_buffer, sizeof(ObjectUBO), &cube_man, GL_DYNAMIC_STORAGE_BIT);
 
+  glCreateBuffers(1, &mdas_buffer);
+  glNamedBufferStorage(mdas_buffer, sizeof(ObjectUBO), &mdas, GL_DYNAMIC_STORAGE_BIT);
+
   glCreateBuffers(1, &floor_object_buffer);
   glNamedBufferStorage(floor_object_buffer, sizeof(ObjectUBO), &floor_object, GL_DYNAMIC_STORAGE_BIT);
 
@@ -98,6 +110,8 @@ Application::~Application() {
   glDeleteBuffers(1, &lights_buffer);
   glDeleteBuffers(1, &floor_object_buffer);
   glDeleteBuffers(1, &clock_buffer);
+  glDeleteBuffers(1, &cube_man_buffer);
+  glDeleteBuffers(1, &mdas_buffer);
 
   glDeleteTextures(1, &default_texture);
 
@@ -157,6 +171,9 @@ void Application::render() {
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_buffer);
   cube_man_mesh.draw();
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, mdas_buffer);
+  mdas_mesh.draw();
 
   // Draw lights using Instanced rendering
   glUseProgram(draw_lights_program);
