@@ -169,10 +169,14 @@ void Application::render() {
     mesh->draw();
   }
 
+  glUseProgram(draw_object_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_buffer);
+  glBindTextureUnit(0, cube_man_texture);
   cube_man_mesh.draw();
 
+  
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, mdas_buffer);
+  glBindTextureUnit(0, mdas_cover_texture);
   mdas_mesh.draw();
 
   // Draw lights using Instanced rendering

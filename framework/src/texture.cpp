@@ -6,6 +6,7 @@
 
 GLuint load_texture_2d(const std::string &filename) {
   int width, height, channels;
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load(filename.c_str(), &width, &height, &channels, 4);
 
   GLuint texture;

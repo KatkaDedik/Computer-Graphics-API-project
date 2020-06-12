@@ -111,13 +111,14 @@ private:
   Mesh cube_man_mesh = *Mesh::from_file("objects/cube_man.obj")[0];
   ObjectUBO cube_man;
   GLuint cube_man_buffer = 0;
-  GLuint cube_man_texture = load_texture_2d("object/Zeleznak.jpg");
+  GLuint cube_man_texture = load_texture_2d("objects/Zeleznak.jpg");
   
   //matematika drsne a svizne
   Mesh mdas_mesh = *Mesh::from_file("objects/mdas.obj")[0];
   ObjectUBO mdas;
   GLuint mdas_buffer = 0;
-  GLuint mdas_texture = load_texture_2d("object/Zeleznak.jpg");
+  GLuint mdas_cover_texture = load_texture_2d("objects/cover.jpg");
+  GLuint mdas_pages_texture = load_texture_2d("objects/bookpages.jpg");
 
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;
