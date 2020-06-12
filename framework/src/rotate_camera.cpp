@@ -16,7 +16,7 @@ RotateCamera::RotateCamera()
 
 void RotateCamera::update_eye_pos() {
   eye_position.x = distance * cosf(angle_elevation) * -sinf(angle_direction);
-  eye_position.y = distance * sinf(angle_elevation);
+  eye_position.y = mid_y + distance * sinf(angle_elevation);
   eye_position.z = distance * cosf(angle_elevation) * cosf(angle_direction);
 }
 
@@ -35,6 +35,14 @@ void RotateCamera::on_mouse_button(int button, int action, int mods) {
       is_zooming = true;
     } else {
       is_zooming = false;
+    }
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+    if (action == GLFW_PRESS) {
+      updown = true;
+    } else {
+      updown = false;
     }
   }
 }
@@ -62,6 +70,17 @@ void RotateCamera::on_mouse_move(double x, double y) {
     if (distance < min_distance)
       distance = min_distance;
   }
+
+  if (updown) {
+    mid_y += dy * angle_sensitivity;
+
+    // Clamp the results
+    if (mid_y > 20)
+      mid_y = 20;
+    if (mid_y < -20)
+      mid_y = -20;
+  }
+
   update_eye_pos();
 }
 

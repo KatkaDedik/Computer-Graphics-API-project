@@ -49,6 +49,10 @@ private:
   /// Recomputes 'eye_position' from 'angle_direction', 'angle_elevation', and 'distance'
   void update_eye_pos();
 
+  float mid_y = 5.0f;
+
+  bool updown = false;
+
 public:
   RotateCamera();
 
