@@ -131,6 +131,7 @@ configure_file(${SHADERS}/postprocess.frag ${SHADERS_BINARY}/postprocess.frag CO
 set(IMAGES ${CMAKE_CURRENT_SOURCE_DIR}/images)
 set(IMAGES_BINARY ${CMAKE_CURRENT_BINARY_DIR}/images)
 configure_file(${IMAGES}/default.png ${IMAGES_BINARY}/default.png COPYONLY)
+configure_file(${IMAGES}/black.png ${IMAGES_BINARY}/black.png COPYONLY)
 
 set(OBJECTS ${CMAKE_CURRENT_SOURCE_DIR}/objects)
 set(OBJECTS_BINARY ${CMAKE_CURRENT_BINARY_DIR}/objects)

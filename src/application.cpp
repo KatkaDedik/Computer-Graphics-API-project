@@ -34,11 +34,24 @@ Application::Application(size_t initial_width, size_t initial_height) {
 
   clock[0].specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  cube_man.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-                                    glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
-  cube_man.ambient_color = glm::vec4(0.0f);
-  cube_man.diffuse_color = glm::vec4(1.0f);
-  cube_man.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+  cube_man_right.model_matrix = glm::mat4(
+	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
+	  glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
+  cube_man_right.ambient_color = glm::vec4(0.0f);
+  cube_man_right.diffuse_color = glm::vec4(1.0f);
+  cube_man_right.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+
+  cube_man_left.model_matrix = glm::mat4(
+	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
+	  glm::vec4(-6.0f, 0.0f, 0.0f, 1.0f));
+  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -3.14f, glm::vec3(0.0f, 1.0f, 0.0f));
+  cube_man_left.ambient_color = glm::vec4(0.0f);
+  cube_man_left.diffuse_color = glm::vec4(1.0f);
+  cube_man_left.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
   mdas.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
                                 glm::vec4(-5.0f, 2.0f, 0.0f, 1.0f));
@@ -78,8 +91,11 @@ Application::Application(size_t initial_width, size_t initial_height) {
     glNamedBufferStorage(clock_buffer[i], sizeof(ObjectUBO), &clock[i], GL_DYNAMIC_STORAGE_BIT);
   }
 
-  glCreateBuffers(1, &cube_man_buffer);
-  glNamedBufferStorage(cube_man_buffer, sizeof(ObjectUBO), &cube_man, GL_DYNAMIC_STORAGE_BIT);
+  glCreateBuffers(1, &cube_man_right_buffer);
+  glNamedBufferStorage(cube_man_right_buffer, sizeof(ObjectUBO), &cube_man_right, GL_DYNAMIC_STORAGE_BIT);
+
+  glCreateBuffers(1, &cube_man_left_buffer);
+  glNamedBufferStorage(cube_man_left_buffer, sizeof(ObjectUBO), &cube_man_left, GL_DYNAMIC_STORAGE_BIT);
 
   glCreateBuffers(1, &mdas_buffer);
   glNamedBufferStorage(mdas_buffer, sizeof(ObjectUBO), &mdas, GL_DYNAMIC_STORAGE_BIT);
@@ -113,7 +129,7 @@ Application::~Application() {
   glDeleteBuffers(1, &lights_buffer);
   glDeleteBuffers(1, &floor_object_buffer);
   glDeleteBuffers(7, clock_buffer.data());
-  glDeleteBuffers(1, &cube_man_buffer);
+  glDeleteBuffers(1, &cube_man_right_buffer);
   glDeleteBuffers(1, &mdas_buffer);
 
   glDeleteTextures(1, &default_texture);
@@ -127,8 +143,6 @@ Application::~Application() {
 }
 
 void Application::render() {
-
-  
 
   // --------------------------------------------------------------------------
   // Update data
@@ -145,9 +159,11 @@ void Application::render() {
 
   // Bind the Framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, postprocess_framebuffer);
+  auto time_now = std::chrono::high_resolution_clock::now();
+  current_color = ((((time_now - begin_time).count() / 1000000) + 700) / 2000)  % 4;
 
   // Clear attachments
-  glClearNamedFramebufferfv(postprocess_framebuffer, GL_COLOR, 0, clear_color);
+  glClearNamedFramebufferfv(postprocess_framebuffer, GL_COLOR, 0, (const float *) &kahoot_colors[current_color].data);
   glClearNamedFramebufferfv(postprocess_framebuffer, GL_DEPTH, 0, clear_depth);
 
   // Configure fixed function pipeline
@@ -169,13 +185,14 @@ void Application::render() {
     mesh->draw();
   }*/
 
-  glUseProgram(draw_object_program);
+  glUseProgram(draw_object_textured_program);
   y_position += direction;
   if (y_position > 2.0f || y_position < 0.0f) {
     direction = -direction;
   }
   float direction_rotation = 1.0f;
-    for (size_t i = 0; i < clock_mesh.size(); i++) {
+  glBindTextureUnit(0, black_texture);
+  for (size_t i = 0; i < clock_mesh.size(); i++) {
     direction_rotation = -direction_rotation;
     clock[i].model_matrix = glm::rotate(clock[i].model_matrix, 0.005f + 0.005f * i * direction_rotation, glm::vec3(0.0f, 1.0f, 0.0f));
     clock[i].model_matrix = glm::translate(clock[i].model_matrix, glm::vec3(0.0f, direction * i, 0.0f));
@@ -184,8 +201,23 @@ void Application::render() {
     clock_mesh[i]->draw();
   }
 
-  glUseProgram(draw_object_textured_program);
-  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_buffer);
+  
+  if (current_color % 2) {
+	cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
+    cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
+  } else {
+    cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
+    cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
+  }
+  glNamedBufferSubData(cube_man_right_buffer, 0, sizeof(ObjectUBO), &cube_man_right);
+  glNamedBufferSubData(cube_man_left_buffer, 0, sizeof(ObjectUBO), &cube_man_left);
+
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_right_buffer);
+  glBindTextureUnit(0, cube_man_texture);
+  cube_man_mesh.draw();
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_left_buffer);
   glBindTextureUnit(0, cube_man_texture);
   cube_man_mesh.draw();
 

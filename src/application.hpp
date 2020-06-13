@@ -2,6 +2,7 @@
 #include "audio.h"
 #include <array>
 #include <algorithm>
+#include <chrono>
 
 // ----------------------------------------------------------------------------
 // LOW-LEVEL LIBRARIES
@@ -59,6 +60,15 @@ struct ObjectUBO {
 class Application {
 
   Audio music = Audio("music/Kahoot.mp3");
+  std::chrono::high_resolution_clock::time_point begin_time = std::chrono::high_resolution_clock::now();
+  const std::array<glm::vec4, 4> kahoot_colors = {{
+		  glm::vec4(226, 27, 60, 256) / 256.0f, 
+		  glm::vec4(18, 104, 205, 256) / 256.0f, 
+		  glm::vec4(216, 158, 0, 256) / 256.0f, 
+		  glm::vec4(42, 143, 13, 256) / 256.0f
+	  }};
+
+  int current_color = 0;
 
 public:
   Application(size_t initial_width, size_t initial_height);
@@ -111,14 +121,16 @@ private:
   std::vector<std::unique_ptr<Mesh>> clock_mesh = Mesh::from_file("objects/clock.obj");
   std::array<ObjectUBO, 7> clock;
   std::array<GLuint, 7> clock_buffer = {0};
-  GLuint default_texture = load_texture_2d("images/default.png");
+  GLuint black_texture = load_texture_2d("images/black.png");
   float direction = 0.1f;
   float y_position = 0.0f;
 
   // exekutor co berie pracku
   Mesh cube_man_mesh = *Mesh::from_file("objects/cube_man.obj")[0];
-  ObjectUBO cube_man;
-  GLuint cube_man_buffer = 0;
+  ObjectUBO cube_man_right;
+  ObjectUBO cube_man_left;
+  GLuint cube_man_right_buffer = 0;
+  GLuint cube_man_left_buffer = 0;
   GLuint cube_man_texture = load_texture_2d("objects/Zeleznak.jpg");
 
   // matematika drsne a svizne
