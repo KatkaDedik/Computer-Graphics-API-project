@@ -150,3 +150,4 @@ configure_file(${OBJECTS}/bookpages.jpg ${OBJECTS_BINARY}/bookpages.jpg COPYONLY
 set(MUSIC ${CMAKE_CURRENT_SOURCE_DIR}/music)
 set(MUSIC_BINARY ${CMAKE_CURRENT_BINARY_DIR}/music)
 configure_file(${MUSIC}/Kahoot.mp3 ${MUSIC_BINARY}/Kahoot.mp3 COPYONLY)
+configure_file(${MUSIC}/kahoot_notes.txt ${MUSIC_BINARY}/kahoot_notes.txt COPYONLY)

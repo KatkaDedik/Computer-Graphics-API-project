@@ -1,8 +1,16 @@
 #include "application.hpp"
+#include <iostream>
 
 Application::Application(size_t initial_width, size_t initial_height) {
   this->width = initial_width;
   this->height = initial_height;
+
+  notes = std::fstream("music/kahoot_notes.txt", std::ios::in);
+
+  if (!notes.is_open()) {
+	std::cerr << "pici";
+  }
+    
 
   // --------------------------------------------------------------------------
   // Initialize Data
@@ -26,39 +34,31 @@ Application::Application(size_t initial_width, size_t initial_height) {
   std::swap(clock_mesh[6], clock_mesh[5]);
 
   for (size_t i = 0; i < clock.size(); i++) {
-    clock[i].model_matrix = glm::mat4(
-		glm::vec4(0.05f, 0.0f, 0.0f, 0.0f),
-		glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-        glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
-		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    clock[i].model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+                                      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     clock[i].ambient_color = glm::vec4(0.0f);
     clock[i].diffuse_color = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
     clock[i].specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
   }
 
- 
-
-  cube_man_right.model_matrix = glm::mat4(
-	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
-	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
-	  glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
+  cube_man_right.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+                                          glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
   cube_man_right.ambient_color = glm::vec4(0.0f);
   cube_man_right.diffuse_color = glm::vec4(1.0f);
   cube_man_right.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  cube_man_left.model_matrix = glm::mat4(
-	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
-	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
-	  glm::vec4(-6.0f, 0.0f, 0.0f, 1.0f));
+  cube_man_left.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+                                         glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(-6.0f, 0.0f, 0.0f, 1.0f));
   cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -3.14f, glm::vec3(0.0f, 1.0f, 0.0f));
   cube_man_left.ambient_color = glm::vec4(0.0f);
   cube_man_left.diffuse_color = glm::vec4(1.0f);
   cube_man_left.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  mdas.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
-                                glm::vec4(-5.0f, 2.0f, 0.0f, 1.0f));
+  mdas.model_matrix = glm::mat4(
+	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f),
+	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+	  glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
+      glm::vec4(5.0f, 5.0f, 5.0f, 1.0f));
   mdas.ambient_color = glm::vec4(0.0f);
   mdas.diffuse_color = glm::vec4(1.0f);
   mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
@@ -165,10 +165,10 @@ void Application::render() {
   // Bind the Framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, postprocess_framebuffer);
   auto time_now = std::chrono::high_resolution_clock::now();
-  current_color = ((((time_now - begin_time).count() / 1000000) + 700) / 2000)  % 4;
+  current_color = ((((time_now - begin_time).count() / 1000000) + 700) / 2000) % 4;
 
   // Clear attachments
-  glClearNamedFramebufferfv(postprocess_framebuffer, GL_COLOR, 0, (const float *) &kahoot_colors[current_color].data);
+  glClearNamedFramebufferfv(postprocess_framebuffer, GL_COLOR, 0, (const float *)&kahoot_colors[current_color].data);
   glClearNamedFramebufferfv(postprocess_framebuffer, GL_DEPTH, 0, clear_depth);
 
   // Configure fixed function pipeline
@@ -200,14 +200,14 @@ void Application::render() {
     direction_rotation = -direction_rotation;
     clock[i].model_matrix = glm::rotate(clock[i].model_matrix, 0.005f + 0.005f * i * direction_rotation, glm::vec3(0.0f, 1.0f, 0.0f));
     clock[i].model_matrix = glm::translate(clock[i].model_matrix, glm::vec3(0.0f, direction * i, 0.0f));
-	glNamedBufferSubData(clock_buffer[i], 0, sizeof(ObjectUBO), &clock[i]);
+    glNamedBufferSubData(clock_buffer[i], 0, sizeof(ObjectUBO), &clock[i]);
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer[i]);
     clock_mesh[i]->draw();
   }
 
   glUseProgram(draw_object_textured_program);
   if (current_color % 2) {
-	cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
+    cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
     cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
   } else {
     cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -215,7 +215,6 @@ void Application::render() {
   }
   glNamedBufferSubData(cube_man_right_buffer, 0, sizeof(ObjectUBO), &cube_man_right);
   glNamedBufferSubData(cube_man_left_buffer, 0, sizeof(ObjectUBO), &cube_man_left);
-
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_right_buffer);
   glBindTextureUnit(0, cube_man_texture);
@@ -225,9 +224,59 @@ void Application::render() {
   glBindTextureUnit(0, cube_man_texture);
   cube_man_mesh.draw();
 
+  if ((time_now - begin_time).count() / 1000000 >= last_beat + beat) {
+    last_beat = last_beat + beat;
+    if(!std::getline(notes, current_notes)){
+      std::cout << "end";
+      current_notes = "123456";
+	}
+  }
+
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, mdas_buffer);
   glBindTextureUnit(0, mdas_cover_texture);
-  mdas_mesh.draw();
+  int n = 0;
+
+  n = current_notes.at(0) - '0';
+  if (n < 10 && n >= 0) {
+    int move = (n)*10;
+    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(move, 0.0f, 0.0f));
+    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+    mdas_mesh.draw();
+    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
+    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+  }
+
+  n = current_notes.at(1) - '0';
+  if (n < 10 && n >= 0) {
+    int move = (n - 5) * 10;
+    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(move, 0.0f, 0.0f));
+    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+    mdas_mesh.draw();
+    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
+    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+  }
+
+  for (size_t i = 2; i < current_notes.size(); i++) {
+    n = current_notes.at(i) - '0';
+
+	/*if (n < 10 && n >= 0) {
+      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(n * 30 - 40.0f, 0.0f, i * 30));
+      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+      mdas_mesh.draw();
+      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-(n * 30 - 40.0f), 0.0f, -(i * 30.0f)));
+      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+	}*/
+
+
+	if (n < 10 && n >= 0) {
+      int move = (n - 5 * i - 1) * 10;
+      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(move , 0.0f, 0.0f));
+      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+      mdas_mesh.draw();
+      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
+      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+    }
+  }
 
   // Draw lights using Instanced rendering
   glUseProgram(draw_lights_program);

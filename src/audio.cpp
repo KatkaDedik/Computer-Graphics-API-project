@@ -8,6 +8,8 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include <miniaudio.h>
 
+#include <vector>
+
 
 static void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
   ma_decoder *pDecoder = (ma_decoder *)pDevice->pUserData;
@@ -16,6 +18,12 @@ static void data_callback(ma_device *pDevice, void *pOutput, const void *pInput,
   }
 
   ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount);
+
+  std::vector<short> smth;
+
+  for (int i = 0; i < 20; i++) {
+    smth.emplace_back(((short*)pOutput)[i]);
+  }
 
   (void)pInput;
 }
@@ -27,7 +35,12 @@ Audio::Audio(const std::string &filename) {
     throw std::logic_error("wtf!");
   }
 
-  ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
+  
+
+  ma_device_config deviceConfig;
+
+  
+  deviceConfig = ma_device_config_init(ma_device_type_playback);	
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;

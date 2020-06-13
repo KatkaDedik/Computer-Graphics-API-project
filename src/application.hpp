@@ -3,6 +3,9 @@
 #include <array>
 #include <algorithm>
 #include <chrono>
+#include <fstream>
+#include <string>
+#include <stdexcept>
 
 // ----------------------------------------------------------------------------
 // LOW-LEVEL LIBRARIES
@@ -59,14 +62,16 @@ struct ObjectUBO {
 // ----------------------------------------------------------------------------
 class Application {
 
+  std::fstream notes;
+
+  std::string current_notes = "------";
   Audio music = Audio("music/Kahoot.mp3");
+  const int beat = 250;
+  int last_beat = 0;
   std::chrono::high_resolution_clock::time_point begin_time = std::chrono::high_resolution_clock::now();
-  const std::array<glm::vec4, 4> kahoot_colors = {{
-		  glm::vec4(226, 27, 60, 256) / 256.0f, 
-		  glm::vec4(18, 104, 205, 256) / 256.0f, 
-		  glm::vec4(216, 158, 0, 256) / 256.0f, 
-		  glm::vec4(42, 143, 13, 256) / 256.0f
-	  }};
+
+  const std::array<glm::vec4, 4> kahoot_colors = {{glm::vec4(226, 27, 60, 256) / 256.0f, glm::vec4(18, 104, 205, 256) / 256.0f,
+                                                   glm::vec4(216, 158, 0, 256) / 256.0f, glm::vec4(42, 143, 13, 256) / 256.0f}};
 
   int current_color = 0;
 
@@ -85,8 +90,8 @@ public:
   void on_key_pressed(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 private:
-  size_t width;
-  size_t height;
+  GLsizei width;
+  GLsizei height;
 
   // ----------------------------------------------------------------------------
   // CAMERA
