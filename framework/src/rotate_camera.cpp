@@ -9,7 +9,7 @@ const float RotateCamera::angle_sensitivity = 0.008f;
 const float RotateCamera::zoom_sensitivity = 0.003f;
 
 RotateCamera::RotateCamera()
-    : angle_direction(0.0f), angle_elevation(0.785398163f), distance(15.0f), last_x(0), last_y(0), is_rotating(false),
+    : angle_direction(0.0f), angle_elevation(0.785398163f), distance(15.0f), last_x(0), last_y(10), is_rotating(false),
       is_zooming(false) {
   update_eye_pos();
 }
@@ -72,7 +72,7 @@ void RotateCamera::on_mouse_move(double x, double y) {
   }
 
   if (updown) {
-    mid_y += dy * angle_sensitivity;
+    mid_y += dy * 0.05f;
 
     // Clamp the results
     if (mid_y > 20)

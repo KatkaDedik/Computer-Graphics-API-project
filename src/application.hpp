@@ -6,6 +6,8 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
+#include <set>
+#include <tuple>
 
 // ----------------------------------------------------------------------------
 // LOW-LEVEL LIBRARIES
@@ -31,6 +33,8 @@
 // Used for clering custom framebuffers(glClearNamedFramebufferfv)
 const float clear_color[4] = {0.0, 0.0, 0.0, 1.0};
 const float clear_depth[1] = {1.0};
+const int max_teapots = 60;
+const float default_height = 10.0f;
 
 // ----------------------------------------------------------------------------
 // UNIFORM STRUCTS
@@ -57,21 +61,28 @@ struct ObjectUBO {
   glm::vec4 specular_color; // [ 96 - 112) bytes
 };
 
+
+
 // ----------------------------------------------------------------------------
 // APPLICATION
 // ----------------------------------------------------------------------------
 class Application {
 
   std::fstream notes;
-
   std::string current_notes = "------";
   Audio music = Audio("music/Kahoot.mp3");
   const int beat = 250;
-  int last_beat = 0;
+  int last_beat = -40;
+  int last_teapot_index = 0;
+  std::vector<std::chrono::high_resolution_clock::time_point> teapot_times;
+  std::vector<ObjectUBO> teapot_ubos;
   std::chrono::high_resolution_clock::time_point begin_time = std::chrono::high_resolution_clock::now();
 
-  const std::array<glm::vec4, 4> kahoot_colors = {{glm::vec4(226, 27, 60, 256) / 256.0f, glm::vec4(18, 104, 205, 256) / 256.0f,
-                                                   glm::vec4(216, 158, 0, 256) / 256.0f, glm::vec4(42, 143, 13, 256) / 256.0f}};
+  const std::array<glm::vec4, 4> kahoot_colors = {{
+		  glm::vec4(226, 27, 60, 256) / 256.0f,
+	      glm::vec4(18, 104, 205, 256) / 256.0f,
+          glm::vec4(216, 158, 0, 256) / 256.0f, 
+		  glm::vec4(42, 143, 13, 256) / 256.0f}};
 
   int current_color = 0;
 
@@ -109,6 +120,8 @@ private:
   GLuint draw_object_program = create_program("shaders/draw_object.vert", "shaders/draw_object.frag");
   GLuint draw_object_textured_program = create_program("shaders/draw_object_textured.vert", "shaders/draw_object_textured.frag");
   GLuint postprocess_program = create_program("shaders/postprocess.vert", "shaders/postprocess.frag");
+  GLuint draw_teapots_program = create_program("shaders/draw_teapots.vert", "shaders/draw_teapots.frag");
+
 
   // ----------------------------------------------------------------------------
   // SCENES/OBJECTS
@@ -150,6 +163,7 @@ private:
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;
 
+  GLuint teapot_buffer = 0;
   // ----------------------------------------------------------------------------
   // LIGHTS
   // ----------------------------------------------------------------------------

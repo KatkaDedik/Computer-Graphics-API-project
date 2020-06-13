@@ -123,6 +123,8 @@ configure_file(${SHADERS}/draw_lights.vert ${SHADERS_BINARY}/draw_lights.vert CO
 configure_file(${SHADERS}/draw_lights.frag ${SHADERS_BINARY}/draw_lights.frag COPYONLY)
 configure_file(${SHADERS}/draw_object.vert ${SHADERS_BINARY}/draw_object.vert COPYONLY)
 configure_file(${SHADERS}/draw_object.frag ${SHADERS_BINARY}/draw_object.frag COPYONLY)
+configure_file(${SHADERS}/draw_teapots.vert ${SHADERS_BINARY}/draw_teapots.vert COPYONLY)
+configure_file(${SHADERS}/draw_teapots.frag ${SHADERS_BINARY}/draw_teapots.frag COPYONLY)
 configure_file(${SHADERS}/draw_object_textured.vert ${SHADERS_BINARY}/draw_object_textured.vert COPYONLY)
 configure_file(${SHADERS}/draw_object_textured.frag ${SHADERS_BINARY}/draw_object_textured.frag COPYONLY)
 configure_file(${SHADERS}/postprocess.vert ${SHADERS_BINARY}/postprocess.vert COPYONLY)

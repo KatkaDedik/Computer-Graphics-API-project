@@ -8,9 +8,8 @@ Application::Application(size_t initial_width, size_t initial_height) {
   notes = std::fstream("music/kahoot_notes.txt", std::ios::in);
 
   if (!notes.is_open()) {
-	std::cerr << "pici";
+    std::cerr << "pici";
   }
-    
 
   // --------------------------------------------------------------------------
   // Initialize Data
@@ -54,11 +53,8 @@ Application::Application(size_t initial_width, size_t initial_height) {
   cube_man_left.diffuse_color = glm::vec4(1.0f);
   cube_man_left.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  mdas.model_matrix = glm::mat4(
-	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f),
-	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-	  glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
-      glm::vec4(5.0f, 5.0f, 5.0f, 1.0f));
+  mdas.model_matrix = glm::mat4(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+                                glm::vec4(5.0f, 5.0f, 5.0f, 1.0f));
   mdas.ambient_color = glm::vec4(0.0f);
   mdas.diffuse_color = glm::vec4(1.0f);
   mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
@@ -67,6 +63,20 @@ Application::Application(size_t initial_width, size_t initial_height) {
   floor_object.ambient_color = glm::vec4(0.0f);
   floor_object.diffuse_color = glm::vec4(1.0f);
   floor_object.specular_color = glm::vec4(1.0f);
+
+  for (int i = 0; i < max_teapots; i++) {
+    ObjectUBO tp;
+    tp.model_matrix = glm::mat4(
+		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), 
+		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), 
+		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec4(100.0f, 10.0f, 0.0f, 1.0f));
+    mdas.ambient_color = glm::vec4(0.0f);
+    mdas.diffuse_color = glm::vec4(1.0f);
+    mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+    teapot_ubos.emplace_back(tp);
+    teapot_times.emplace_back(std::chrono::high_resolution_clock::now());
+  }
 
   // Scatter lights
   for (int x = -10; x < 10; x += 2) {
@@ -103,6 +113,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
 
   glCreateBuffers(1, &mdas_buffer);
   glNamedBufferStorage(mdas_buffer, sizeof(ObjectUBO), &mdas, GL_DYNAMIC_STORAGE_BIT);
+
+  glCreateBuffers(1, &teapot_buffer);
+  glNamedBufferStorage(teapot_buffer, sizeof(ObjectUBO) * max_teapots, teapot_ubos.data(), GL_DYNAMIC_STORAGE_BIT);
 
   glCreateBuffers(1, &floor_object_buffer);
   glNamedBufferStorage(floor_object_buffer, sizeof(ObjectUBO), &floor_object, GL_DYNAMIC_STORAGE_BIT);
@@ -183,12 +196,6 @@ void Application::render() {
   glBindTextureUnit(0, default_texture);
   cube.draw();
 
-  // Draw several objects loaded through the Mesh class
-  /*glUseProgram(draw_object_program);
-  for (auto &mesh : obj_test_scene) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, default_object_buffer);
-    mesh->draw();
-  }*/
 
   glUseProgram(draw_object_program);
   y_position += direction;
@@ -226,66 +233,52 @@ void Application::render() {
 
   if ((time_now - begin_time).count() / 1000000 >= last_beat + beat) {
     last_beat = last_beat + beat;
-    if(!std::getline(notes, current_notes)){
+    if (!std::getline(notes, current_notes)) {
       std::cout << "end";
       current_notes = "123456";
-	}
-  }
+    }
 
-  glBindBufferBase(GL_UNIFORM_BUFFER, 2, mdas_buffer);
-  glBindTextureUnit(0, mdas_cover_texture);
-  int n = 0;
-
-  n = current_notes.at(0) - '0';
-  if (n < 10 && n >= 0) {
-    int move = (n)*10;
-    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(move, 0.0f, 0.0f));
-    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-    mdas_mesh.draw();
-    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
-    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-  }
-
-  n = current_notes.at(1) - '0';
-  if (n < 10 && n >= 0) {
-    int move = (n - 5) * 10;
-    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(move, 0.0f, 0.0f));
-    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-    mdas_mesh.draw();
-    mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
-    glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-  }
-
-  for (size_t i = 2; i < current_notes.size(); i++) {
-    n = current_notes.at(i) - '0';
-
-	/*if (n < 10 && n >= 0) {
-      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(n * 30 - 40.0f, 0.0f, i * 30));
-      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-      mdas_mesh.draw();
-      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-(n * 30 - 40.0f), 0.0f, -(i * 30.0f)));
-      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-	}*/
-
-
-	if (n < 10 && n >= 0) {
-      int move = (n - 5 * i - 1) * 10;
-      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(move , 0.0f, 0.0f));
-      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
-      mdas_mesh.draw();
-      mdas.model_matrix = glm::translate(mdas.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
-      glNamedBufferSubData(mdas_buffer, 0, sizeof(ObjectUBO), &mdas);
+    for (size_t i = 0; i < current_notes.size(); i++) {
+      int dif = 1;
+      int n = current_notes.at(i) - '0';
+      if (i == 0 || i == 2) {
+        dif == 0;
+      }
+      if (n < 12 && n >= 0) {
+        int move = ((n - 5 * i - dif) * 2) + 20;
+        ObjectUBO tp;
+        tp.model_matrix = glm::mat4(
+			glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), 
+			glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), 
+			glm::vec4(0.0f, 0.0f, 0.5f, 0.0f),
+            glm::vec4(move, default_height, 3.0f, 1.0f));
+        mdas.ambient_color = glm::vec4(0.0f);
+        mdas.diffuse_color = glm::vec4(1.0f);
+        mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+        teapot_ubos[last_teapot_index] = tp;
+        teapot_times[last_teapot_index] = std::chrono::high_resolution_clock::now();
+        last_teapot_index = (last_teapot_index + 1) % max_teapots;
+      }
     }
   }
 
+  glUseProgram(draw_teapots_program);
+  for (size_t i = 0; i < max_teapots; i++) {
+    float t = (time_now - teapot_times[i]).count() / 1000000000.0f;
+    float new_y = default_height - ((t * t) * 9.8f) / 2.0f;
+    teapot_ubos[i].model_matrix[3][1] = new_y;
+  }
+  glNamedBufferSubData(teapot_buffer, 0, sizeof(ObjectUBO) * max_teapots, teapot_ubos.data());
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, teapot_buffer);
+  glBindVertexArray(teapot.get_vao());
+  glDrawElementsInstanced(teapot.get_mode(), teapot.get_indices_count(), GL_UNSIGNED_INT, nullptr, teapot_ubos.size());
+  
   // Draw lights using Instanced rendering
   glUseProgram(draw_lights_program);
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera_buffer);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lights_buffer);
 
-  glBindVertexArray(teapot.get_vao());
-  glDrawElementsInstanced(teapot.get_mode(), teapot.get_indices_count(), GL_UNSIGNED_INT, nullptr, lights.size());
 
   // --------------------------------------------------------------------------
   // Apply post-process
