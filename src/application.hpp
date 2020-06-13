@@ -117,6 +117,8 @@ private:
   // This is the default material that can be used when nothing else is.
   // You might want to create material UBOs and textures inside the Mesh class.
 
+  GLuint default_texture = load_texture_2d("images/default.png");
+
   // orloj
   std::vector<std::unique_ptr<Mesh>> clock_mesh = Mesh::from_file("objects/clock.obj");
   std::array<ObjectUBO, 7> clock;

@@ -26,13 +26,17 @@ Application::Application(size_t initial_width, size_t initial_height) {
   std::swap(clock_mesh[6], clock_mesh[5]);
 
   for (size_t i = 0; i < clock.size(); i++) {
-    clock[i].model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-                                      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    clock[i].model_matrix = glm::mat4(
+		glm::vec4(0.05f, 0.0f, 0.0f, 0.0f),
+		glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+        glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
+		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     clock[i].ambient_color = glm::vec4(0.0f);
-    clock[i].diffuse_color = glm::vec4(1.0f);
+    clock[i].diffuse_color = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
+    clock[i].specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
   }
 
-  clock[0].specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+ 
 
   cube_man_right.model_matrix = glm::mat4(
 	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
@@ -132,6 +136,7 @@ Application::~Application() {
   glDeleteBuffers(1, &cube_man_right_buffer);
   glDeleteBuffers(1, &mdas_buffer);
 
+  glDeleteTextures(1, &black_texture);
   glDeleteTextures(1, &default_texture);
 
   glDeleteProgram(postprocess_program);
@@ -185,13 +190,12 @@ void Application::render() {
     mesh->draw();
   }*/
 
-  glUseProgram(draw_object_textured_program);
+  glUseProgram(draw_object_program);
   y_position += direction;
   if (y_position > 2.0f || y_position < 0.0f) {
     direction = -direction;
   }
   float direction_rotation = 1.0f;
-  glBindTextureUnit(0, black_texture);
   for (size_t i = 0; i < clock_mesh.size(); i++) {
     direction_rotation = -direction_rotation;
     clock[i].model_matrix = glm::rotate(clock[i].model_matrix, 0.005f + 0.005f * i * direction_rotation, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -201,7 +205,7 @@ void Application::render() {
     clock_mesh[i]->draw();
   }
 
-  
+  glUseProgram(draw_object_textured_program);
   if (current_color % 2) {
 	cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
     cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
