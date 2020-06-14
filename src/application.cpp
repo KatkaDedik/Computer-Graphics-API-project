@@ -213,13 +213,12 @@ void Application::render() {
   }
 
   glUseProgram(draw_object_textured_program);
-  if (current_color % 2) {
-    cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
-    cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
-  } else {
-    cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
-    cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, 0.15f, glm::vec3(0.0f, 1.0f, 0.0f));
-  }
+  float t = (time_now - begin_time).count() / 1000000000.0f;
+  float angle = sinf(t*3.14/2 + 700) * 1.5;
+
+  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+  cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));
+  
   glNamedBufferSubData(cube_man_right_buffer, 0, sizeof(ObjectUBO), &cube_man_right);
   glNamedBufferSubData(cube_man_left_buffer, 0, sizeof(ObjectUBO), &cube_man_left);
 
@@ -230,6 +229,9 @@ void Application::render() {
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_left_buffer);
   glBindTextureUnit(0, cube_man_texture);
   cube_man_mesh.draw();
+
+  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));
+  cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, +angle, glm::vec3(0.0f, 1.0f, 0.0f));
 
   if ((time_now - begin_time).count() / 1000000 >= last_beat + beat) {
     last_beat = last_beat + beat;
