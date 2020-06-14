@@ -58,9 +58,14 @@ Audio::Audio(const std::string &filename) {
     throw std::logic_error("Failed to start playback device.");
   }
 
+  is_initialized = true;
+
 }
 
 Audio::~Audio() {
-  ma_device_uninit(&device);
-  ma_decoder_uninit(&decoder);
+	if (is_initialized) {
+		ma_device_uninit(&device);
+		ma_decoder_uninit(&decoder);
+	}
+
 }

@@ -36,8 +36,8 @@ Application::Application(size_t initial_width, size_t initial_height) {
     clock[i].model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
                                       glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     clock[i].ambient_color = glm::vec4(0.0f);
-    clock[i].diffuse_color = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-    clock[i].specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+    clock[i].diffuse_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    clock[i].specular_color = glm::vec4(0.8f, 0.8f, 0.8f, 50.0f);
   }
 
   cube_man_right.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
@@ -71,9 +71,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
 		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), 
 		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4(100.0f, 10.0f, 0.0f, 1.0f));
-    mdas.ambient_color = glm::vec4(0.0f);
-    mdas.diffuse_color = glm::vec4(1.0f);
-    mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+    tp.ambient_color = glm::vec4(0.0f);
+    tp.diffuse_color = glm::vec4(1.0f);
+    tp.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
     teapot_ubos.emplace_back(tp);
     teapot_times.emplace_back(std::chrono::high_resolution_clock::now());
   }
@@ -161,6 +161,13 @@ Application::~Application() {
 }
 
 void Application::render() {
+
+	if (!is_playing) {
+		music = std::make_unique<Audio>("music/Kahoot.mp3");
+        is_playing = true;
+        begin_time = std::chrono::high_resolution_clock::now();
+	}
+	
 
   // --------------------------------------------------------------------------
   // Update data
@@ -254,9 +261,9 @@ void Application::render() {
 			glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), 
 			glm::vec4(0.0f, 0.0f, 0.5f, 0.0f),
             glm::vec4(move, default_height, 3.0f, 1.0f));
-        mdas.ambient_color = glm::vec4(0.0f);
-        mdas.diffuse_color = glm::vec4(1.0f);
-        mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
+        tp.ambient_color = glm::vec4(0.0f);
+        tp.diffuse_color = glm::vec4(move/10.0f, 0.0f, 0.4f, 1.0f);
+        tp.specular_color = glm::vec4(0.8f, 0.8f, 0.8f, 8.0f);
         teapot_ubos[last_teapot_index] = tp;
         teapot_times[last_teapot_index] = std::chrono::high_resolution_clock::now();
         last_teapot_index = (last_teapot_index + 1) % max_teapots;
@@ -269,6 +276,7 @@ void Application::render() {
     float t = (time_now - teapot_times[i]).count() / 1000000000.0f;
     float new_y = default_height - ((t * t) * 9.8f) / 2.0f;
     teapot_ubos[i].model_matrix[3][1] = new_y;
+    teapot_ubos[i].diffuse_color[1] = - new_y / 15;
   }
   glNamedBufferSubData(teapot_buffer, 0, sizeof(ObjectUBO) * max_teapots, teapot_ubos.data());
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, teapot_buffer);

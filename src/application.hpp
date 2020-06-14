@@ -34,7 +34,7 @@
 const float clear_color[4] = {0.0, 0.0, 0.0, 1.0};
 const float clear_depth[1] = {1.0};
 const int max_teapots = 60;
-const float default_height = 10.0f;
+const float default_height = 15.0f;
 
 // ----------------------------------------------------------------------------
 // UNIFORM STRUCTS
@@ -70,13 +70,14 @@ class Application {
 
   std::fstream notes;
   std::string current_notes = "------";
-  Audio music = Audio("music/Kahoot.mp3");
+  std::unique_ptr<Audio> music;
+  bool is_playing = false;
   const int beat = 250;
   int last_beat = -40;
   int last_teapot_index = 0;
   std::vector<std::chrono::high_resolution_clock::time_point> teapot_times;
   std::vector<ObjectUBO> teapot_ubos;
-  std::chrono::high_resolution_clock::time_point begin_time = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point begin_time;
 
   const std::array<glm::vec4, 4> kahoot_colors = {{
 		  glm::vec4(226, 27, 60, 256) / 256.0f,
