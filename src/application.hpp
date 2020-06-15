@@ -69,15 +69,16 @@ struct ObjectUBO {
 class Application {
 
   std::fstream notes;
-  std::string current_notes = "------";
+  std::string current_notes = "";
   std::unique_ptr<Audio> music;
   bool is_playing = false;
   const int beat = 250;
-  int last_beat = -40;
+  int last_beat = 0;
   int last_teapot_index = 0;
   std::vector<std::chrono::high_resolution_clock::time_point> teapot_times;
   std::vector<ObjectUBO> teapot_ubos;
   std::chrono::high_resolution_clock::time_point begin_time;
+  bool render_started = false;
 
   const std::array<glm::vec4, 4> kahoot_colors = {{
 		  glm::vec4(226, 27, 60, 256) / 256.0f,
@@ -160,6 +161,11 @@ private:
   GLuint mdas_buffer = 0;
   GLuint mdas_cover_texture = load_texture_2d("objects/cover.jpg");
   GLuint mdas_pages_texture = load_texture_2d("objects/bookpages.jpg");
+
+  Mesh piano_mesh = *Mesh::from_file("objects/piano.obj")[0];
+  ObjectUBO piano;
+  ObjectUBO piano_b;
+  GLuint piano_buffer = 0;
 
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;

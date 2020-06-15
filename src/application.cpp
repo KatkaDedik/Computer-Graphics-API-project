@@ -64,6 +64,25 @@ Application::Application(size_t initial_width, size_t initial_height) {
   floor_object.diffuse_color = glm::vec4(1.0f);
   floor_object.specular_color = glm::vec4(1.0f);
 
+  piano.model_matrix = glm::mat4(
+	  glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.0f, 0.5f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+  piano.ambient_color = glm::vec4(0.0f);
+  piano.diffuse_color = glm::vec4(1.0f);
+  piano.specular_color = glm::vec4(1.0f);
+
+  piano_b.model_matrix = glm::mat4(
+	  glm::vec4(0.3f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.3f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.0f, 0.3f, 0.0f),
+      glm::vec4(0.0f, 0.5f, 0.0f, 1.0f));
+  piano_b.ambient_color = glm::vec4(0.0f);
+  piano_b.diffuse_color = glm::vec4(0.1f);
+  piano_b.specular_color = glm::vec4(0.3f);
+
+
   for (int i = 0; i < max_teapots; i++) {
     ObjectUBO tp;
     tp.model_matrix = glm::mat4(
@@ -114,6 +133,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &mdas_buffer);
   glNamedBufferStorage(mdas_buffer, sizeof(ObjectUBO), &mdas, GL_DYNAMIC_STORAGE_BIT);
 
+  glCreateBuffers(1, &piano_buffer);
+  glNamedBufferStorage(piano_buffer, sizeof(ObjectUBO), &piano, GL_DYNAMIC_STORAGE_BIT);
+
   glCreateBuffers(1, &teapot_buffer);
   glNamedBufferStorage(teapot_buffer, sizeof(ObjectUBO) * max_teapots, teapot_ubos.data(), GL_DYNAMIC_STORAGE_BIT);
 
@@ -162,10 +184,19 @@ Application::~Application() {
 
 void Application::render() {
 
+  auto time_now = std::chrono::high_resolution_clock::now();
+
+	if (!render_started) {
+		begin_time = std::chrono::high_resolution_clock::now();
+        render_started = true;
+	}
+
 	if (!is_playing) {
-		music = std::make_unique<Audio>("music/Kahoot.mp3");
-        is_playing = true;
-        begin_time = std::chrono::high_resolution_clock::now();
+		
+       if ((time_now - begin_time).count() / 1000000.0f > 700.0f) {
+		 music = std::make_unique<Audio>("music/Kahoot.mp3");
+		 is_playing = true;
+	   }
 	}
 	
 
@@ -184,7 +215,6 @@ void Application::render() {
 
   // Bind the Framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, postprocess_framebuffer);
-  auto time_now = std::chrono::high_resolution_clock::now();
   current_color = ((((time_now - begin_time).count() / 1000000) + 700) / 2000) % 4;
 
   // Clear attachments
@@ -197,14 +227,42 @@ void Application::render() {
   glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera_buffer);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lights_buffer);
 
-  // Draw floor using the built-in object
+  // Draw 
   glUseProgram(draw_object_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, floor_object_buffer);
   glBindTextureUnit(0, default_texture);
   cube.draw();
 
+  glUseProgram(draw_object_program); 
+  int count = 22;
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
+  for (int i = 0; i < count; i++) {
+    float move = ((6.28 / static_cast<float>(count)) * i);
+    piano.model_matrix = glm::translate(piano.model_matrix, glm::vec3(sinf(move) * 10, 0.0f, cosf(move)* 10) );
+    piano.model_matrix = glm::rotate(piano.model_matrix, 6.28f / count * i, glm::vec3(0.0f, 1.0f, 0.0f));
+    glNamedBufferSubData(piano_buffer, 0, sizeof(ObjectUBO), &piano);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
+	piano_mesh.draw();
+    piano.model_matrix = glm::rotate(piano.model_matrix, -6.28f / count * i, glm::vec3(0.0f, 1.0f, 0.0f));
+    piano.model_matrix = glm::translate(piano.model_matrix, glm::vec3(-sinf(move) * 10, 0.0f, -cosf(move)*10));
+  }
 
-  glUseProgram(draw_object_program);
+
+  for (int i = 0; i < count; i++) {
+    float move = ((6.28 / static_cast<float>(count)) * i);
+    if (i != 0 && i != 3 && i != 8 && i != 11 && i != 15 && i != 18) {
+      float move = ((6.28 / static_cast<float>(count)) * (i + 0.5f) );
+      piano_b.model_matrix = glm::translate(piano_b.model_matrix, glm::vec3(sinf(move) * 14, 0.0f, cosf(move) * 14));
+      piano_b.model_matrix = glm::rotate(piano_b.model_matrix, 6.28f / count * (i + 0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+      glNamedBufferSubData(piano_buffer, 0, sizeof(ObjectUBO), &piano_b);
+      glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
+	  piano_mesh.draw();
+      piano_b.model_matrix = glm::rotate(piano_b.model_matrix, -6.28f / count * (i + 0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+          piano_b.model_matrix = glm::translate(piano_b.model_matrix, glm::vec3(-sinf(move) * 14, 0.0f, -cosf(move) * 14));
+	}
+  }
+  
+
   y_position += direction;
   if (y_position > 2.0f || y_position < 0.0f) {
     direction = -direction;
@@ -218,6 +276,7 @@ void Application::render() {
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer[i]);
     clock_mesh[i]->draw();
   }
+
 
   glUseProgram(draw_object_textured_program);
   float t = (time_now - begin_time).count() / 1000000000.0f;
@@ -244,30 +303,30 @@ void Application::render() {
     last_beat = last_beat + beat;
     if (!std::getline(notes, current_notes)) {
       std::cout << "end";
-      current_notes = "123456";
+      current_notes = "GHIJKLMNO";
     }
-
+	int z = 6;
     for (size_t i = 0; i < current_notes.size(); i++) {
-      int dif = 1;
-      int n = current_notes.at(i) - '0';
-      if (i == 0 || i == 2) {
-        dif == 0;
-      }
-      if (n < 12 && n >= 0) {
-        int move = ((n - 5 * i - dif) * 2) + 20;
+      int n = current_notes.at(i);
+      
+      if (n != ';') {
+        n -= '=';
+        int move = n + z*7 -50;
         ObjectUBO tp;
         tp.model_matrix = glm::mat4(
 			glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), 
 			glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), 
 			glm::vec4(0.0f, 0.0f, 0.5f, 0.0f),
-            glm::vec4(move, default_height, 3.0f, 1.0f));
+            glm::vec4(move, default_height, z, 1.0f));
         tp.ambient_color = glm::vec4(0.0f);
-        tp.diffuse_color = glm::vec4(move/10.0f, 0.0f, 0.4f, 1.0f);
+        tp.diffuse_color = glm::vec4(move/10.0f, 0.0f, z/10.0f, 1.0f);
         tp.specular_color = glm::vec4(0.8f, 0.8f, 0.8f, 8.0f);
         teapot_ubos[last_teapot_index] = tp;
         teapot_times[last_teapot_index] = std::chrono::high_resolution_clock::now();
         last_teapot_index = (last_teapot_index + 1) % max_teapots;
-      }
+      }else{
+        z -= 4; //z = 2
+	  }
     }
   }
 

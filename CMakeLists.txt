@@ -148,6 +148,7 @@ configure_file(${OBJECTS}/mdas.obj ${OBJECTS_BINARY}/mdas.obj COPYONLY)
 configure_file(${OBJECTS}/mdas.mtl ${OBJECTS_BINARY}/mdas.mtl COPYONLY)
 configure_file(${OBJECTS}/cover.jpg ${OBJECTS_BINARY}/cover.jpg COPYONLY)
 configure_file(${OBJECTS}/bookpages.jpg ${OBJECTS_BINARY}/bookpages.jpg COPYONLY)
+configure_file(${OBJECTS}/piano.obj ${OBJECTS_BINARY}/piano.obj COPYONLY)
 
 set(MUSIC ${CMAKE_CURRENT_SOURCE_DIR}/music)
 set(MUSIC_BINARY ${CMAKE_CURRENT_BINARY_DIR}/music)
