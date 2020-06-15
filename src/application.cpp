@@ -33,21 +33,27 @@ Application::Application(size_t initial_width, size_t initial_height) {
   std::swap(clock_mesh[6], clock_mesh[5]);
 
   for (size_t i = 0; i < clock.size(); i++) {
-    clock[i].model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-                                      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    clock[i].model_matrix = glm::mat4(glm::vec4(0.07f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.07f, 0.0f, 0.0f),
+                                      glm::vec4(0.0f, 0.0f, 0.07f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     clock[i].ambient_color = glm::vec4(0.0f);
     clock[i].diffuse_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     clock[i].specular_color = glm::vec4(0.8f, 0.8f, 0.8f, 50.0f);
   }
 
-  cube_man_right.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-                                          glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
+  cube_man_right.model_matrix = glm::mat4(
+	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f),
+	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
+	  glm::vec4(15.0f, 0.0f, 0.0f, 1.0f));
   cube_man_right.ambient_color = glm::vec4(0.0f);
   cube_man_right.diffuse_color = glm::vec4(1.0f);
   cube_man_right.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  cube_man_left.model_matrix = glm::mat4(glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
-                                         glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), glm::vec4(-6.0f, 0.0f, 0.0f, 1.0f));
+  cube_man_left.model_matrix = glm::mat4(
+	  glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.05f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f), 
+	  glm::vec4(-15.0f, 0.0f, 0.0f, 1.0f));
   cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -3.14f, glm::vec3(0.0f, 1.0f, 0.0f));
   cube_man_left.ambient_color = glm::vec4(0.0f);
   cube_man_left.diffuse_color = glm::vec4(1.0f);
@@ -59,7 +65,7 @@ Application::Application(size_t initial_width, size_t initial_height) {
   mdas.diffuse_color = glm::vec4(1.0f);
   mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  floor_object.model_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(8.0, 0.01f, 8.0f));
+  floor_object.model_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(40.0, 0.01f, 40.0f));
   floor_object.ambient_color = glm::vec4(0.0f);
   floor_object.diffuse_color = glm::vec4(1.0f);
   floor_object.specular_color = glm::vec4(1.0f);
@@ -81,6 +87,15 @@ Application::Application(size_t initial_width, size_t initial_height) {
   piano_b.ambient_color = glm::vec4(0.0f);
   piano_b.diffuse_color = glm::vec4(0.1f);
   piano_b.specular_color = glm::vec4(0.3f);
+
+  beer.model_matrix = glm::mat4(
+	  glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+      glm::vec4(10.0f, 2.0f, 0.0f, 1.0f));
+  beer.ambient_color = glm::vec4(0.0f);
+  beer.diffuse_color = glm::vec4(0.1f);
+  beer.specular_color = glm::vec4(0.3f);
 
 
   for (int i = 0; i < max_teapots; i++) {
@@ -133,6 +148,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &mdas_buffer);
   glNamedBufferStorage(mdas_buffer, sizeof(ObjectUBO), &mdas, GL_DYNAMIC_STORAGE_BIT);
 
+  glCreateBuffers(1, &beer_buffer);
+  glNamedBufferStorage(beer_buffer, sizeof(ObjectUBO), &beer, GL_DYNAMIC_STORAGE_BIT);
+
   glCreateBuffers(1, &piano_buffer);
   glNamedBufferStorage(piano_buffer, sizeof(ObjectUBO), &piano, GL_DYNAMIC_STORAGE_BIT);
 
@@ -184,7 +202,7 @@ Application::~Application() {
 
 void Application::render() {
 
-  auto time_now = std::chrono::high_resolution_clock::now();
+  time_now = std::chrono::high_resolution_clock::now();
 
 	if (!render_started) {
 		begin_time = std::chrono::high_resolution_clock::now();
@@ -233,102 +251,14 @@ void Application::render() {
   glBindTextureUnit(0, default_texture);
   cube.draw();
 
-  glUseProgram(draw_object_program); 
-  int count = 22;
-  glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
-  for (int i = 0; i < count; i++) {
-    float move = ((6.28 / static_cast<float>(count)) * i);
-    piano.model_matrix = glm::translate(piano.model_matrix, glm::vec3(sinf(move) * 10, 0.0f, cosf(move)* 10) );
-    piano.model_matrix = glm::rotate(piano.model_matrix, 6.28f / count * i, glm::vec3(0.0f, 1.0f, 0.0f));
-    glNamedBufferSubData(piano_buffer, 0, sizeof(ObjectUBO), &piano);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
-	piano_mesh.draw();
-    piano.model_matrix = glm::rotate(piano.model_matrix, -6.28f / count * i, glm::vec3(0.0f, 1.0f, 0.0f));
-    piano.model_matrix = glm::translate(piano.model_matrix, glm::vec3(-sinf(move) * 10, 0.0f, -cosf(move)*10));
-  }
+  draw_clock();
+  draw_executor();
+  draw_teapots();
+  draw_piano();
 
-
-  for (int i = 0; i < count; i++) {
-    float move = ((6.28 / static_cast<float>(count)) * i);
-    if (i != 0 && i != 3 && i != 8 && i != 11 && i != 15 && i != 18) {
-      float move = ((6.28 / static_cast<float>(count)) * (i + 0.5f) );
-      piano_b.model_matrix = glm::translate(piano_b.model_matrix, glm::vec3(sinf(move) * 14, 0.0f, cosf(move) * 14));
-      piano_b.model_matrix = glm::rotate(piano_b.model_matrix, 6.28f / count * (i + 0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
-      glNamedBufferSubData(piano_buffer, 0, sizeof(ObjectUBO), &piano_b);
-      glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
-	  piano_mesh.draw();
-      piano_b.model_matrix = glm::rotate(piano_b.model_matrix, -6.28f / count * (i + 0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
-          piano_b.model_matrix = glm::translate(piano_b.model_matrix, glm::vec3(-sinf(move) * 14, 0.0f, -cosf(move) * 14));
-	}
-  }
-  
-
-  y_position += direction;
-  if (y_position > 2.0f || y_position < 0.0f) {
-    direction = -direction;
-  }
-  float direction_rotation = 1.0f;
-  for (size_t i = 0; i < clock_mesh.size(); i++) {
-    direction_rotation = -direction_rotation;
-    clock[i].model_matrix = glm::rotate(clock[i].model_matrix, 0.005f + 0.005f * i * direction_rotation, glm::vec3(0.0f, 1.0f, 0.0f));
-    clock[i].model_matrix = glm::translate(clock[i].model_matrix, glm::vec3(0.0f, direction * i, 0.0f));
-    glNamedBufferSubData(clock_buffer[i], 0, sizeof(ObjectUBO), &clock[i]);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer[i]);
-    clock_mesh[i]->draw();
-  }
-
-
-  glUseProgram(draw_object_textured_program);
-  float t = (time_now - begin_time).count() / 1000000000.0f;
-  float angle = sinf(t*3.14/2 + 700) * 1.5;
-
-  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-  cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));
-  
-  glNamedBufferSubData(cube_man_right_buffer, 0, sizeof(ObjectUBO), &cube_man_right);
-  glNamedBufferSubData(cube_man_left_buffer, 0, sizeof(ObjectUBO), &cube_man_left);
-
-  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_right_buffer);
-  glBindTextureUnit(0, cube_man_texture);
-  cube_man_mesh.draw();
-
-  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_left_buffer);
-  glBindTextureUnit(0, cube_man_texture);
-  cube_man_mesh.draw();
-
-  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));
-  cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, +angle, glm::vec3(0.0f, 1.0f, 0.0f));
-
-  if ((time_now - begin_time).count() / 1000000 >= last_beat + beat) {
-    last_beat = last_beat + beat;
-    if (!std::getline(notes, current_notes)) {
-      std::cout << "end";
-      current_notes = "GHIJKLMNO";
-    }
-	int z = 6;
-    for (size_t i = 0; i < current_notes.size(); i++) {
-      int n = current_notes.at(i);
-      
-      if (n != ';') {
-        n -= '=';
-        int move = n + z*7 -50;
-        ObjectUBO tp;
-        tp.model_matrix = glm::mat4(
-			glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), 
-			glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), 
-			glm::vec4(0.0f, 0.0f, 0.5f, 0.0f),
-            glm::vec4(move, default_height, z, 1.0f));
-        tp.ambient_color = glm::vec4(0.0f);
-        tp.diffuse_color = glm::vec4(move/10.0f, 0.0f, z/10.0f, 1.0f);
-        tp.specular_color = glm::vec4(0.8f, 0.8f, 0.8f, 8.0f);
-        teapot_ubos[last_teapot_index] = tp;
-        teapot_times[last_teapot_index] = std::chrono::high_resolution_clock::now();
-        last_teapot_index = (last_teapot_index + 1) % max_teapots;
-      }else{
-        z -= 4; //z = 2
-	  }
-    }
-  }
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, beer_buffer);
+  glBindTextureUnit(0, beer_texture);
+  beer_mesh.draw();
 
   glUseProgram(draw_teapots_program);
   for (size_t i = 0; i < max_teapots; i++) {
@@ -371,6 +301,110 @@ void Application::render() {
 
   // Draw the full-screen triangle
   glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+
+void Application::draw_clock() {
+  y_position += direction;
+  if (y_position > 2.0f || y_position < 0.0f) {
+    direction = -direction;
+  }
+  float direction_rotation = 1.0f;
+  for (size_t i = 0; i < clock_mesh.size(); i++) {
+    direction_rotation = -direction_rotation;
+    clock[i].model_matrix = glm::rotate(clock[i].model_matrix, 0.005f + 0.005f * i * direction_rotation, glm::vec3(0.0f, 1.0f, 0.0f));
+    clock[i].model_matrix = glm::translate(clock[i].model_matrix, glm::vec3(0.0f, direction * i, 0.0f));
+    glNamedBufferSubData(clock_buffer[i], 0, sizeof(ObjectUBO), &clock[i]);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, clock_buffer[i]);
+    clock_mesh[i]->draw();
+  }
+}
+
+void Application::draw_executor() {
+  glUseProgram(draw_object_textured_program);
+  float t = (time_now - begin_time).count() / 1000000000.0f;
+  float angle = sinf(t * 3.14 / 2 + 700) * 1.5;
+
+  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+  cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));
+
+  glNamedBufferSubData(cube_man_right_buffer, 0, sizeof(ObjectUBO), &cube_man_right);
+  glNamedBufferSubData(cube_man_left_buffer, 0, sizeof(ObjectUBO), &cube_man_left);
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_right_buffer);
+  glBindTextureUnit(0, cube_man_texture);
+  cube_man_mesh.draw();
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_left_buffer);
+  glBindTextureUnit(0, cube_man_texture);
+  cube_man_mesh.draw();
+
+  cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));
+  cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, +angle, glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+void Application::draw_mdas(){
+
+}
+
+void Application::draw_piano(){
+  glUseProgram(draw_object_program);
+  int count = 22;
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
+  for (int i = 0; i < count; i++) {
+    float move = ((6.28 / static_cast<float>(count)) * i);
+    piano.model_matrix = glm::translate(piano.model_matrix, glm::vec3(sinf(move) * 10, 0.0f, cosf(move) * 10));
+    piano.model_matrix = glm::rotate(piano.model_matrix, 6.28f / count * i, glm::vec3(0.0f, 1.0f, 0.0f));
+    glNamedBufferSubData(piano_buffer, 0, sizeof(ObjectUBO), &piano);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
+    piano_mesh.draw();
+    piano.model_matrix = glm::rotate(piano.model_matrix, -6.28f / count * i, glm::vec3(0.0f, 1.0f, 0.0f));
+    piano.model_matrix = glm::translate(piano.model_matrix, glm::vec3(-sinf(move) * 10, 0.0f, -cosf(move) * 10));
+  }
+
+  for (int i = 0; i < count; i++) {
+    float move = ((6.28 / static_cast<float>(count)) * i);
+    if (i != 0 && i != 3 && i != 8 && i != 11 && i != 15 && i != 18) {
+      float move = ((6.28 / static_cast<float>(count)) * (i + 0.5f));
+      piano_b.model_matrix = glm::translate(piano_b.model_matrix, glm::vec3(sinf(move) * 14, 0.0f, cosf(move) * 14));
+      piano_b.model_matrix = glm::rotate(piano_b.model_matrix, 6.28f / count * (i + 0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+      glNamedBufferSubData(piano_buffer, 0, sizeof(ObjectUBO), &piano_b);
+      glBindBufferBase(GL_UNIFORM_BUFFER, 2, piano_buffer);
+      piano_mesh.draw();
+      piano_b.model_matrix = glm::rotate(piano_b.model_matrix, -6.28f / count * (i + 0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+      piano_b.model_matrix = glm::translate(piano_b.model_matrix, glm::vec3(-sinf(move) * 14, 0.0f, -cosf(move) * 14));
+    }
+  }
+}
+
+void Application::draw_teapots(){
+  if ((time_now - begin_time).count() / 1000000 >= last_beat + beat) {
+    last_beat = last_beat + beat;
+    if (!std::getline(notes, current_notes)) {
+      std::cout << "end";
+      current_notes = "GHIJKLMNO";
+    }
+    int z = 6;
+    for (size_t i = 0; i < current_notes.size(); i++) {
+      int n = current_notes.at(i);
+
+      if (n != ';') {
+        n -= '=';
+        int move = n + z * 7 - 50;
+        ObjectUBO tp;
+        tp.model_matrix = glm::mat4(glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.5f, 0.0f),
+                                    glm::vec4(move, default_height, z, 1.0f));
+        tp.ambient_color = glm::vec4(0.0f);
+        tp.diffuse_color = glm::vec4(move / 10.0f, 0.0f, z / 10.0f, 1.0f);
+        tp.specular_color = glm::vec4(0.8f, 0.8f, 0.8f, 8.0f);
+        teapot_ubos[last_teapot_index] = tp;
+        teapot_times[last_teapot_index] = std::chrono::high_resolution_clock::now();
+        last_teapot_index = (last_teapot_index + 1) % max_teapots;
+      } else {
+        z -= 4; // z = 2
+      }
+    }
+  }
 }
 
 void Application::on_resize(GLFWwindow *window, int width, int height) {

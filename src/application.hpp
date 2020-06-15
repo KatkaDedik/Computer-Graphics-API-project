@@ -78,6 +78,7 @@ class Application {
   std::vector<std::chrono::high_resolution_clock::time_point> teapot_times;
   std::vector<ObjectUBO> teapot_ubos;
   std::chrono::high_resolution_clock::time_point begin_time;
+  std::chrono::high_resolution_clock::time_point time_now;
   bool render_started = false;
 
   const std::array<glm::vec4, 4> kahoot_colors = {{
@@ -147,6 +148,8 @@ private:
   float direction = 0.1f;
   float y_position = 0.0f;
 
+  
+
   // exekutor co berie pracku
   Mesh cube_man_mesh = *Mesh::from_file("objects/cube_man.obj")[0];
   ObjectUBO cube_man_right;
@@ -167,10 +170,21 @@ private:
   ObjectUBO piano_b;
   GLuint piano_buffer = 0;
 
+  Mesh beer_mesh = *Mesh::from_file("objects/beer.obj")[0];
+  ObjectUBO beer;
+  GLuint beer_buffer = 0;
+  GLuint beer_texture = load_texture_2d("objects/beer.jpg");
+
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;
 
   GLuint teapot_buffer = 0;
+
+  void draw_clock();
+  void draw_executor();
+  void draw_mdas();
+  void draw_piano();
+  void draw_teapots();
   // ----------------------------------------------------------------------------
   // LIGHTS
   // ----------------------------------------------------------------------------
