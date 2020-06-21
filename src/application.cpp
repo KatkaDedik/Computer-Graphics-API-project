@@ -196,6 +196,7 @@ Application::~Application() {
   glDeleteProgram(draw_object_textured_program);
   glDeleteProgram(draw_object_program);
   glDeleteProgram(draw_lights_program);
+  glDeleteProgram(draw_object_normal_textured_program);
 
   glDeleteBuffers(1, &camera_buffer);
 }
@@ -246,10 +247,12 @@ void Application::render() {
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lights_buffer);
 
   // Draw 
-  glUseProgram(draw_object_textured_program);
+  glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, floor_object_buffer);
   glBindTextureUnit(0, beer_texture);
+  glBindTextureUnit(1, beer_normal_texture);
   cube.draw();
+
 
   draw_clock();
   draw_executor();
@@ -322,7 +325,7 @@ void Application::draw_clock() {
 }
 
 void Application::draw_executor() {
-  glUseProgram(draw_object_textured_program);
+  glUseProgram(draw_object_normal_textured_program);
   float t = (time_now - begin_time).count() / 1000000000.0f;
   float angle = sinf(t * 3.14 / 2 + 700) * 1.5;
 
@@ -334,10 +337,12 @@ void Application::draw_executor() {
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_right_buffer);
   glBindTextureUnit(0, cube_man_texture);
+  glBindTextureUnit(1, cube_man_normal_map);
   cube_man_mesh.draw();
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, cube_man_left_buffer);
   glBindTextureUnit(0, cube_man_texture);
+  glBindTextureUnit(1, cube_man_normal_map);
   cube_man_mesh.draw();
 
   cube_man_left.model_matrix = glm::rotate(cube_man_left.model_matrix, -angle, glm::vec3(0.0f, 1.0f, 0.0f));

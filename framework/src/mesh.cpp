@@ -25,6 +25,17 @@ Mesh::Mesh(std::vector<float> vertices, std::vector<float> normals, std::vector<
   if (!tex_coords.empty()) {
     glCreateBuffers(1, &tex_coords_buffer);
     glNamedBufferStorage(tex_coords_buffer, tex_coords.size() * sizeof(float), tex_coords.data(), GL_DYNAMIC_STORAGE_BIT);
+
+    std::vector<glm::vec3> tangents;
+    std::vector<glm::vec3> bitangents;
+
+    computeTangentBasis(vertices, tex_coords, tangents, bitangents);
+
+    glCreateBuffers(1, &tangent_buffer);
+    glNamedBufferStorage(tangent_buffer, tangents.size() * sizeof(glm::vec3), tangents.data(), GL_DYNAMIC_STORAGE_BIT);
+
+    glCreateBuffers(1, &bitangent_buffer);
+    glNamedBufferStorage(bitangent_buffer, bitangents.size() * sizeof(glm::vec3), bitangents.data(), GL_DYNAMIC_STORAGE_BIT);
   }
 
   if (!indices.empty()) {
@@ -59,6 +70,18 @@ Mesh::Mesh(const Mesh &other) {
     glCopyNamedBufferSubData(other.normals_buffer, normals_buffer, 0, 0, vertices_count * sizeof(float) * 3);
   }
 
+  if (other.tangent_buffer != 0) {
+    glCreateBuffers(1, &tangent_buffer);
+    glNamedBufferStorage(tangent_buffer, vertices_count * sizeof(float) * 3, nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glCopyNamedBufferSubData(other.tangent_buffer, tangent_buffer, 0, 0, vertices_count * sizeof(float) * 3);
+  }
+
+  if (other.bitangent_buffer != 0) {
+    glCreateBuffers(1, &bitangent_buffer);
+    glNamedBufferStorage(bitangent_buffer, vertices_count * sizeof(float) * 3, nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glCopyNamedBufferSubData(other.bitangent_buffer, bitangent_buffer, 0, 0, vertices_count * sizeof(float) * 3);
+  }
+
   // Copy texture coordinates
   if (other.tex_coords_buffer != 0) {
     glCreateBuffers(1, &tex_coords_buffer);
@@ -78,7 +101,8 @@ Mesh::Mesh(const Mesh &other) {
   recreate_vao(other.position_location, other.normal_location, other.tex_coord_location);
 }
 
-void Mesh::recreate_vao(GLint position_location, GLint normal_location, GLint tex_coord_location) {
+void Mesh::recreate_vao(GLint position_location, GLint normal_location, GLint tex_coord_location, GLint tangent_location,
+                        GLint bitangent_location) {
   // In case it was created before
   glDeleteVertexArrays(1, &vao);
 
@@ -94,14 +118,28 @@ void Mesh::recreate_vao(GLint position_location, GLint normal_location, GLint te
     glVertexArrayAttribBinding(vao, position_location, position_location);
   }
 
+  if (tangent_location >= 0) {
+    this->tangent_location = tangent_location;
+    glVertexArrayVertexBuffer(vao, tangent_location, tangent_buffer, 0, 3 * sizeof(float));
+
+    glEnableVertexArrayAttrib(vao, tangent_location);
+    glVertexArrayAttribFormat(vao, tangent_location, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(vao, tangent_location, tangent_location);
+  }
+
+  if (bitangent_location >= 0) {
+    this->bitangent_location = bitangent_location;
+    glVertexArrayVertexBuffer(vao, bitangent_location, tangent_buffer, 0, 3 * sizeof(float));
+
+    glEnableVertexArrayAttrib(vao, bitangent_location);
+    glVertexArrayAttribFormat(vao, bitangent_location, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(vao, bitangent_location, bitangent_location);
+  }
+
   if (normal_location >= 0) {
     this->normal_location = normal_location;
 
-    glVertexArrayVertexBuffer(vao, 
-		                      normal_location, 
-		                      normals_buffer, 
-		                      0, 
-		                      3 * sizeof(float));
+    glVertexArrayVertexBuffer(vao, normal_location, normals_buffer, 0, 3 * sizeof(float));
 
     glEnableVertexArrayAttrib(vao, normal_location);
     glVertexArrayAttribFormat(vao, normal_location, 3, GL_FLOAT, GL_FALSE, 0);
@@ -175,7 +213,7 @@ Mesh Mesh::teapot(GLint position_location, GLint normal_location, GLint tex_coor
 }
 
 std::vector<std::unique_ptr<Mesh>> Mesh::from_file(const std::string &file_name, GLint position_location, GLint normal_location,
-                                                   GLint tex_coord_location) {
+                                                   GLint tex_coord_location, GLint tangent_location, GLint bitangent_location) {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
@@ -219,7 +257,7 @@ std::vector<std::unique_ptr<Mesh>> Mesh::from_file(const std::string &file_name,
     }
 
     meshes.push_back(std::make_unique<Mesh>(vertices, normals, tex_coords, std::vector<uint32_t>()));
-    meshes[meshes.size() - 1]->recreate_vao(position_location, normal_location, tex_coord_location);
+    meshes[meshes.size() - 1]->recreate_vao(position_location, normal_location, tex_coord_location, tangent_location, bitangent_location);
   }
 
   return meshes;
@@ -235,4 +273,45 @@ Mesh::~Mesh() {
   glDeleteBuffers(1, &this->normals_buffer);
   glDeleteBuffers(1, &this->tex_coords_buffer);
   glDeleteBuffers(1, &this->indices_buffer);
+}
+
+void Mesh::computeTangentBasis(
+    // inputs
+    std::vector<float> &vertices, std::vector<float> &uvs,
+    // outputs
+    std::vector<glm::vec3> &tangents, std::vector<glm::vec3> &bitangents) {
+
+  for (int i = 0; i < vertices.size() / 9; i++) {
+
+    // Shortcuts for vertices
+    glm::vec3 v0(vertices[(i * 9) + 0], vertices[(i * 9) + 1], vertices[(i * 9) + 2]);
+    glm::vec3 v1(vertices[(i * 9) + 3], vertices[(i * 9) + 4], vertices[(i * 9) + 5]);
+    glm::vec3 v2(vertices[(i * 9) + 6], vertices[(i * 9) + 7], vertices[(i * 9) + 8]);
+
+    // Shortcuts for UVs
+    glm::vec2 uv0(uvs[(i * 6) + 0], uvs[(i * 6) + 1]);
+    glm::vec2 uv1(uvs[(i * 6) + 2], uvs[(i * 6) + 3]);
+    glm::vec2 uv2(uvs[(i * 6) + 4], uvs[(i * 6) + 5]);
+
+    // Edges of the triangle : position delta
+    glm::vec3 deltaPos1 = v1 - v0;
+    glm::vec3 deltaPos2 = v2 - v0;
+
+    // UV delta
+    glm::vec2 deltaUV1 = uv1 - uv0;
+    glm::vec2 deltaUV2 = uv2 - uv0;
+
+    float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+    glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+    glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+
+    tangents.push_back(tangent);
+    tangents.push_back(tangent);
+    tangents.push_back(tangent);
+
+    // Same thing for bitangents
+    bitangents.push_back(bitangent);
+    bitangents.push_back(bitangent);
+    bitangents.push_back(bitangent);
+  }
 }

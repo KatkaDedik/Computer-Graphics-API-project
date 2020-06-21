@@ -125,6 +125,9 @@ configure_file(${SHADERS}/draw_object.vert ${SHADERS_BINARY}/draw_object.vert CO
 configure_file(${SHADERS}/draw_object.frag ${SHADERS_BINARY}/draw_object.frag COPYONLY)
 configure_file(${SHADERS}/draw_teapots.vert ${SHADERS_BINARY}/draw_teapots.vert COPYONLY)
 configure_file(${SHADERS}/draw_teapots.frag ${SHADERS_BINARY}/draw_teapots.frag COPYONLY)
+
+configure_file(${SHADERS}/draw_object_normal_textured.vert ${SHADERS_BINARY}/draw_object_normal_textured.vert COPYONLY)
+configure_file(${SHADERS}/draw_object_normal_textured.frag ${SHADERS_BINARY}/draw_object_normal_textured.frag COPYONLY)
 configure_file(${SHADERS}/draw_object_textured.vert ${SHADERS_BINARY}/draw_object_textured.vert COPYONLY)
 configure_file(${SHADERS}/draw_object_textured.frag ${SHADERS_BINARY}/draw_object_textured.frag COPYONLY)
 configure_file(${SHADERS}/postprocess.vert ${SHADERS_BINARY}/postprocess.vert COPYONLY)
@@ -151,6 +154,9 @@ configure_file(${OBJECTS}/bookpages.jpg ${OBJECTS_BINARY}/bookpages.jpg COPYONLY
 configure_file(${OBJECTS}/piano.obj ${OBJECTS_BINARY}/piano.obj COPYONLY)
 configure_file(${OBJECTS}/beer.obj ${OBJECTS_BINARY}/beer.obj COPYONLY)
 configure_file(${OBJECTS}/beer.jpeg ${OBJECTS_BINARY}/beer.jpeg COPYONLY)
+configure_file(${OBJECTS}/ZeleznakNormalsMap.jpg ${OBJECTS_BINARY}/ZeleznakNormalsMap.jpg COPYONLY)
+configure_file(${OBJECTS}/BeerNormalsMap.jpeg ${OBJECTS_BINARY}/BeerNormalsMap.jpeg COPYONLY)
+
 
 set(MUSIC ${CMAKE_CURRENT_SOURCE_DIR}/music)
 set(MUSIC_BINARY ${CMAKE_CURRENT_BINARY_DIR}/music)

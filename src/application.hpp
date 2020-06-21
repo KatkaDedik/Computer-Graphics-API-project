@@ -124,6 +124,8 @@ private:
   GLuint draw_object_textured_program = create_program("shaders/draw_object_textured.vert", "shaders/draw_object_textured.frag");
   GLuint postprocess_program = create_program("shaders/postprocess.vert", "shaders/postprocess.frag");
   GLuint draw_teapots_program = create_program("shaders/draw_teapots.vert", "shaders/draw_teapots.frag");
+  GLuint draw_object_normal_textured_program = create_program("shaders/draw_object_normal_textured.vert", "shaders/draw_object_normal_textured.frag");
+  
 
 
   // ----------------------------------------------------------------------------
@@ -157,6 +159,7 @@ private:
   GLuint cube_man_right_buffer = 0;
   GLuint cube_man_left_buffer = 0;
   GLuint cube_man_texture = load_texture_2d("objects/Zeleznak.jpg");
+  GLuint cube_man_normal_map = load_texture_2d("objects/ZeleznakNormalsMap.jpg");
 
   // matematika drsne a svizne
   Mesh mdas_mesh = *Mesh::from_file("objects/mdas.obj")[0];
@@ -174,7 +177,8 @@ private:
   ObjectUBO beer;
   GLuint beer_buffer = 0;
   GLuint beer_texture = load_texture_2d("objects/beer.jpeg");
-
+  GLuint beer_normal_texture = load_texture_2d("objects/BeerNormalsMap.jpeg");
+  
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;
 
