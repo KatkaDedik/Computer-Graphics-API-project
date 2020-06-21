@@ -173,7 +173,7 @@ private:
   Mesh beer_mesh = *Mesh::from_file("objects/beer.obj")[0];
   ObjectUBO beer;
   GLuint beer_buffer = 0;
-  GLuint beer_texture = load_texture_2d("objects/beer.jpg");
+  GLuint beer_texture = load_texture_2d("objects/beer.jpeg");
 
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;

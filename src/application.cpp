@@ -94,8 +94,8 @@ Application::Application(size_t initial_width, size_t initial_height) {
 	  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
       glm::vec4(10.0f, 2.0f, 0.0f, 1.0f));
   beer.ambient_color = glm::vec4(0.0f);
-  beer.diffuse_color = glm::vec4(0.1f);
-  beer.specular_color = glm::vec4(0.3f);
+  beer.diffuse_color = glm::vec4(1.0f);
+  beer.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 9.0f);
 
 
   for (int i = 0; i < max_teapots; i++) {
@@ -248,7 +248,7 @@ void Application::render() {
   // Draw 
   glUseProgram(draw_object_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, floor_object_buffer);
-  glBindTextureUnit(0, default_texture);
+  glBindTextureUnit(0, beer_texture);
   cube.draw();
 
   draw_clock();
@@ -256,6 +256,7 @@ void Application::render() {
   draw_teapots();
   draw_piano();
 
+  glUseProgram(draw_object_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, beer_buffer);
   glBindTextureUnit(0, beer_texture);
   beer_mesh.draw();
