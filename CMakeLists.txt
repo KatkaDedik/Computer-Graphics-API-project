@@ -137,6 +137,10 @@ set(IMAGES ${CMAKE_CURRENT_SOURCE_DIR}/images)
 set(IMAGES_BINARY ${CMAKE_CURRENT_BINARY_DIR}/images)
 configure_file(${IMAGES}/default.png ${IMAGES_BINARY}/default.png COPYONLY)
 configure_file(${IMAGES}/black.png ${IMAGES_BINARY}/black.png COPYONLY)
+configure_file(${IMAGES}/floor_normal_map.jpg ${IMAGES_BINARY}/floor_normal_map.jpg COPYONLY)
+configure_file(${IMAGES}/floor.jpg ${IMAGES_BINARY}/floor.jpg COPYONLY)
+configure_file(${IMAGES}/wall_normal_map.jpg ${IMAGES_BINARY}/wall_normal_map.jpg COPYONLY)
+configure_file(${IMAGES}/wall.jpg ${IMAGES_BINARY}/wall.jpg COPYONLY)
 
 set(OBJECTS ${CMAKE_CURRENT_SOURCE_DIR}/objects)
 set(OBJECTS_BINARY ${CMAKE_CURRENT_BINARY_DIR}/objects)
@@ -156,6 +160,7 @@ configure_file(${OBJECTS}/beer.obj ${OBJECTS_BINARY}/beer.obj COPYONLY)
 configure_file(${OBJECTS}/beer.jpeg ${OBJECTS_BINARY}/beer.jpeg COPYONLY)
 configure_file(${OBJECTS}/ZeleznakNormalsMap.jpg ${OBJECTS_BINARY}/ZeleznakNormalsMap.jpg COPYONLY)
 configure_file(${OBJECTS}/BeerNormalsMap.jpeg ${OBJECTS_BINARY}/BeerNormalsMap.jpeg COPYONLY)
+configure_file(${OBJECTS}/wall.obj ${OBJECTS_BINARY}/wall.obj COPYONLY)
 
 
 set(MUSIC ${CMAKE_CURRENT_SOURCE_DIR}/music)

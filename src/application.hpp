@@ -79,7 +79,6 @@ class Application {
   std::vector<ObjectUBO> teapot_ubos;
   std::chrono::high_resolution_clock::time_point begin_time;
   std::chrono::high_resolution_clock::time_point time_now;
-  bool render_started = false;
 
   const std::array<glm::vec4, 4> kahoot_colors = {{
 		  glm::vec4(226, 27, 60, 256) / 256.0f,
@@ -141,6 +140,8 @@ private:
   // You might want to create material UBOs and textures inside the Mesh class.
 
   GLuint default_texture = load_texture_2d("images/default.png");
+  GLuint floor_texture = load_texture_2d("images/floor.jpg");
+  GLuint floor_normal_map = load_texture_2d("images/floor_normal_map.jpg");
 
   // orloj
   std::vector<std::unique_ptr<Mesh>> clock_mesh = Mesh::from_file("objects/clock.obj");
@@ -178,6 +179,12 @@ private:
   GLuint beer_buffer = 0;
   GLuint beer_texture = load_texture_2d("objects/beer.jpeg");
   GLuint beer_normal_texture = load_texture_2d("objects/BeerNormalsMap.jpeg");
+
+  Mesh wall_mesh = *Mesh::from_file("objects/wall.obj")[0];
+  ObjectUBO wall;
+  GLuint wall_buffer = 0;
+  GLuint wall_texture = load_texture_2d("images/wall.jpg");
+  GLuint wall_normal_texture = load_texture_2d("images/wall_normal_map.jpg");
   
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;

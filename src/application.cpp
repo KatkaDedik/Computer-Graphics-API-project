@@ -65,10 +65,10 @@ Application::Application(size_t initial_width, size_t initial_height) {
   mdas.diffuse_color = glm::vec4(1.0f);
   mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  floor_object.model_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(40.0, 0.01f, 40.0f));
+  floor_object.model_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(20.0, 0.01f, 20.0f));
   floor_object.ambient_color = glm::vec4(0.0f);
   floor_object.diffuse_color = glm::vec4(1.0f);
-  floor_object.specular_color = glm::vec4(1.0f);
+  floor_object.specular_color = glm::vec4(0.2f, 0.2f, 0.2f, 8.0f);
 
   piano.model_matrix = glm::mat4(
 	  glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), 
@@ -95,7 +95,16 @@ Application::Application(size_t initial_width, size_t initial_height) {
       glm::vec4(10.0f, 2.0f, 0.0f, 1.0f));
   beer.ambient_color = glm::vec4(0.0f);
   beer.diffuse_color = glm::vec4(1.0f);
-  beer.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 9.0f);
+  beer.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
+
+  wall.model_matrix = glm::mat4(
+      glm::vec4(5.3f, 0.0f, 0.0f, 0.0f), 
+      glm::vec4(0.0f, 5.3f, 0.0f, 0.0f), 
+      glm::vec4(0.0f, 0.0f, 5.3f, 0.0f),
+      glm::vec4(-1.5f, 0.0f, -20.0f, 1.0f));
+  wall.ambient_color = glm::vec4(0.0f);
+  wall.diffuse_color = glm::vec4(1.0f);
+  wall.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
 
 
   for (int i = 0; i < max_teapots; i++) {
@@ -151,6 +160,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &beer_buffer);
   glNamedBufferStorage(beer_buffer, sizeof(ObjectUBO), &beer, GL_DYNAMIC_STORAGE_BIT);
 
+    glCreateBuffers(1, &wall_buffer);
+  glNamedBufferStorage(wall_buffer, sizeof(ObjectUBO), &wall, GL_DYNAMIC_STORAGE_BIT);
+
   glCreateBuffers(1, &piano_buffer);
   glNamedBufferStorage(piano_buffer, sizeof(ObjectUBO), &piano, GL_DYNAMIC_STORAGE_BIT);
 
@@ -203,19 +215,12 @@ Application::~Application() {
 
 void Application::render() {
 
-  time_now = std::chrono::high_resolution_clock::now();
-
-	if (!render_started) {
-		begin_time = std::chrono::high_resolution_clock::now();
-        render_started = true;
-	}
+    time_now = std::chrono::high_resolution_clock::now();
 
 	if (!is_playing) {
-		
-       if ((time_now - begin_time).count() / 1000000.0f > 700.0f) {
-		 music = std::make_unique<Audio>("music/Kahoot.mp3");
-		 is_playing = true;
-	   }
+        begin_time = std::chrono::high_resolution_clock::now();
+		music = std::make_unique<Audio>("music/Kahoot.mp3");
+		is_playing = true;
 	}
 	
 
@@ -249,20 +254,26 @@ void Application::render() {
   // Draw 
   glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, floor_object_buffer);
-  glBindTextureUnit(0, beer_texture);
-  glBindTextureUnit(1, beer_normal_texture);
+  glBindTextureUnit(0, floor_texture);
+  glBindTextureUnit(1, floor_normal_map);
   cube.draw();
-
+  
 
   draw_clock();
   draw_executor();
   draw_teapots();
   draw_piano();
 
-  glUseProgram(draw_object_textured_program);
+  glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, beer_buffer);
   glBindTextureUnit(0, beer_texture);
+  glBindTextureUnit(1, beer_normal_texture);
   beer_mesh.draw();
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, wall_buffer);
+  glBindTextureUnit(0, wall_texture);
+  glBindTextureUnit(1, wall_normal_texture);
+  wall_mesh.draw();
 
   glUseProgram(draw_teapots_program);
   for (size_t i = 0; i < max_teapots; i++) {
