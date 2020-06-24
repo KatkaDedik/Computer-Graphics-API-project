@@ -16,7 +16,7 @@ Application::Application(size_t initial_width, size_t initial_height) {
   // --------------------------------------------------------------------------
   camera_ubo.position = glm::vec4(camera.get_eye_position(), 1.0f);
   camera_ubo.projection = glm::perspective(glm::radians(45.0f), float(width) / float(height), 0.01f, 1000.0f);
-  camera_ubo.view = glm::lookAt(camera.get_eye_position(), glm::vec3(6.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  camera_ubo.view = glm::lookAt(camera.get_eye_position(), camera.get_direction(), glm::vec3(0.0f, 1.0f, 0.0f));
 
   LightUBO directional_light;
   directional_light.position = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);
@@ -230,7 +230,7 @@ void Application::render() {
 
   // Camera
   camera_ubo.position = glm::vec4(camera.get_eye_position(), 1.0f);
-  camera_ubo.view = glm::lookAt(camera.get_eye_position(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  camera_ubo.view = glm::lookAt(camera.get_eye_position(), camera.get_direction(), glm::vec3(0.0f, 1.0f, 0.0f));
   glNamedBufferSubData(camera_buffer, 0, sizeof(CameraUBO), &camera_ubo);
 
   // --------------------------------------------------------------------------
@@ -445,4 +445,4 @@ void Application::on_resize(GLFWwindow *window, int width, int height) {
 }
 void Application::on_mouse_move(GLFWwindow *window, double x, double y) { camera.on_mouse_move(x, y); }
 void Application::on_mouse_pressed(GLFWwindow *window, int button, int action, int mods) { camera.on_mouse_button(button, action, mods); }
-void Application::on_key_pressed(GLFWwindow *window, int key, int scancode, int action, int mods) {}
+void Application::on_key_pressed(GLFWwindow *window, int key, int scancode, int action, int mods) { camera.on_key_press(key); }

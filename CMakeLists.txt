@@ -69,6 +69,8 @@ add_library(framework
 	"${FRAMEWORK_SRC_DIR}/mesh.cpp"
 	"${FRAMEWORK_INCLUDE_DIR}/rotate_camera.hpp"
 	"${FRAMEWORK_SRC_DIR}/rotate_camera.cpp"
+		"${FRAMEWORK_INCLUDE_DIR}/camera.hpp"
+	"${FRAMEWORK_SRC_DIR}/camera.cpp"
 	"${FRAMEWORK_INCLUDE_DIR}/texture.hpp"
 	"${FRAMEWORK_SRC_DIR}/texture.cpp"
 	

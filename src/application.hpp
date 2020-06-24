@@ -26,6 +26,7 @@
 #include "rotate_camera.hpp"
 #include "utilities.hpp"
 #include "texture.hpp"
+#include "camera.hpp"
 
 // ----------------------------------------------------------------------------
 // CONSTANTS
@@ -111,7 +112,10 @@ private:
   // - By default the camera that rotates around the center is implemented. Feel
   //   free to replace it by your own Camera for ex. FPS one.
   // ----------------------------------------------------------------------------
-  RotateCamera camera;
+  Camera camera;
+
+
+  //RotateCamera camera;
   CameraUBO camera_ubo;
   GLuint camera_buffer = 0;
 
