@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <set>
 #include <tuple>
+#include <cmath>
 
 // ----------------------------------------------------------------------------
 // LOW-LEVEL LIBRARIES
@@ -210,6 +211,7 @@ private:
   void draw_mdas();
   void draw_piano();
   void draw_teapots();
+  void draw_car();
   // ----------------------------------------------------------------------------
   // LIGHTS
   // ----------------------------------------------------------------------------

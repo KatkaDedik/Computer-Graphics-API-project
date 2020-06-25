@@ -89,9 +89,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
   piano_b.specular_color = glm::vec4(0.3f);
 
   beer.model_matrix = glm::mat4(
-	  glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), 
-	  glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), 
-	  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+	  glm::vec4(0.2f, 0.0f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.2f, 0.0f, 0.0f), 
+	  glm::vec4(0.0f, 0.0f, 0.2f, 0.0f),
       glm::vec4(10.0f, 2.0f, 0.0f, 1.0f));
   beer.ambient_color = glm::vec4(0.0f);
   beer.diffuse_color = glm::vec4(1.0f);
@@ -110,16 +110,17 @@ Application::Application(size_t initial_width, size_t initial_height) {
       glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
       glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), 
       glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
-      glm::vec4(-10.0f, 3.0f, -5.0f, 1.0f));
+      glm::vec4(-10.0f, 3.0f, -10.0f, 1.0f));
   electro.ambient_color = glm::vec4(0.0f);
   electro.diffuse_color = glm::vec4(1.0f);
   electro.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
 
-  car.model_matrix = glm::mat4(
-      glm::vec4(0.06f, 0.0f, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.06f, 0.0f, 0.0f),
-      glm::vec4(0.0f, 0.0f, 0.06f, 0.0f),
-      glm::vec4(5.5f, 2.0f, -9.0f, 1.0f));
+  car.model_matrix = glm::rotate(glm::mat4(
+      glm::vec4(0.07f, 0.0f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.07f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.07f, 0.0f),
+      glm::vec4(10.0f, 2.0f, -14.0f, 1.0f)),
+      45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
   car.ambient_color = glm::vec4(0.0f);
   car.diffuse_color = glm::vec4(1.0f);
   car.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
@@ -285,11 +286,11 @@ void Application::render() {
   glBindTextureUnit(1, floor_normal_map);
   cube.draw();
   
-
   draw_clock();
   draw_executor();
   draw_teapots();
   draw_piano();
+  draw_car();
 
   glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, beer_buffer);
@@ -306,11 +307,6 @@ void Application::render() {
   glBindTextureUnit(0, electro_texture);
   glBindTextureUnit(1, electro_normal_texture);
   electro_mesh.draw();
-
-  glUseProgram(draw_object_program);
-  glBindBufferBase(GL_UNIFORM_BUFFER, 2, car_buffer);
-  car_mesh[0]->draw();
-  car_mesh[1]->draw();
 
   glUseProgram(draw_teapots_program);
   for (size_t i = 0; i < max_teapots; i++) {
@@ -371,6 +367,68 @@ void Application::draw_clock() {
     clock_mesh[i]->draw();
   }
 }
+
+void Application::draw_car() {
+  glUseProgram(draw_object_program);
+  float t = (time_now - begin_time).count() / 1000000000.0f;
+  float angle = cosf(t * 3.14 / 2 + 700) * 0.2;
+  float x = sinf(angle) * 5.0f;
+  float move = 40.0f;
+  float delay = 0.02;
+
+  if (angle < 0) {
+
+      angle += delay;
+
+      if (angle < 0) {
+          car.model_matrix = glm::translate(car.model_matrix, glm::vec3( move, 0.0f, 0.0f));
+          car.model_matrix = glm::rotate(car.model_matrix, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+          car.model_matrix = glm::translate(car.model_matrix, glm::vec3(-move + x, 0, 0.0f));
+
+          glNamedBufferSubData(car_buffer, 0, sizeof(ObjectUBO), &car);
+          glBindBufferBase(GL_UNIFORM_BUFFER, 2, car_buffer);
+          for (const auto &mesh : car_mesh) {
+            mesh->draw();
+          }
+          car.model_matrix = glm::translate(car.model_matrix, glm::vec3(move - x, 0, 0.0f));
+          car.model_matrix = glm::rotate(car.model_matrix, -angle, glm::vec3(0.0f, 0.0f, 1.0f));
+          car.model_matrix = glm::translate(car.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
+      
+      } else {
+        glNamedBufferSubData(car_buffer, 0, sizeof(ObjectUBO), &car);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 2, car_buffer);
+        for (const auto &mesh : car_mesh) {
+          mesh->draw();
+        }
+      }
+
+  } else {
+
+    angle -= delay;
+
+    if (angle > 0) {
+    
+      car.model_matrix = glm::translate(car.model_matrix, glm::vec3(-move, 0.0f, 0.0f));
+      car.model_matrix = glm::rotate(car.model_matrix, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+      car.model_matrix = glm::translate(car.model_matrix, glm::vec3(move + x, 0, 0.0f));
+
+      glNamedBufferSubData(car_buffer, 0, sizeof(ObjectUBO), &car);
+      glBindBufferBase(GL_UNIFORM_BUFFER, 2, car_buffer);
+      for (const auto &mesh : car_mesh) {
+        mesh->draw();
+      }
+      car.model_matrix = glm::translate(car.model_matrix, glm::vec3(-move - x, 0, 0.0f));
+      car.model_matrix = glm::rotate(car.model_matrix, -angle, glm::vec3(0.0f, 0.0f, 1.0f));
+      car.model_matrix = glm::translate(car.model_matrix, glm::vec3(move, 0.0f, 0.0f));
+
+    } else {
+      glNamedBufferSubData(car_buffer, 0, sizeof(ObjectUBO), &car);
+      glBindBufferBase(GL_UNIFORM_BUFFER, 2, car_buffer);
+      for (const auto &mesh : car_mesh) {
+        mesh->draw();
+      }
+    }
+  }}
 
 void Application::draw_executor() {
   glUseProgram(draw_object_normal_textured_program);
