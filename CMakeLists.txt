@@ -143,6 +143,8 @@ configure_file(${IMAGES}/floor_normal_map.jpg ${IMAGES_BINARY}/floor_normal_map.
 configure_file(${IMAGES}/floor.jpg ${IMAGES_BINARY}/floor.jpg COPYONLY)
 configure_file(${IMAGES}/wall_normal_map.jpg ${IMAGES_BINARY}/wall_normal_map.jpg COPYONLY)
 configure_file(${IMAGES}/wall.jpg ${IMAGES_BINARY}/wall.jpg COPYONLY)
+configure_file(${IMAGES}/el.jpg ${IMAGES_BINARY}/el.jpg COPYONLY)
+configure_file(${IMAGES}/el_normal_map.jpg ${IMAGES_BINARY}/el_normal_map.jpg COPYONLY)
 
 set(OBJECTS ${CMAKE_CURRENT_SOURCE_DIR}/objects)
 set(OBJECTS_BINARY ${CMAKE_CURRENT_BINARY_DIR}/objects)
@@ -163,6 +165,8 @@ configure_file(${OBJECTS}/beer.jpeg ${OBJECTS_BINARY}/beer.jpeg COPYONLY)
 configure_file(${OBJECTS}/ZeleznakNormalsMap.jpg ${OBJECTS_BINARY}/ZeleznakNormalsMap.jpg COPYONLY)
 configure_file(${OBJECTS}/BeerNormalsMap.jpeg ${OBJECTS_BINARY}/BeerNormalsMap.jpeg COPYONLY)
 configure_file(${OBJECTS}/wall.obj ${OBJECTS_BINARY}/wall.obj COPYONLY)
+configure_file(${OBJECTS}/car.obj ${OBJECTS_BINARY}/car.obj COPYONLY)
+configure_file(${OBJECTS}/electro.obj ${OBJECTS_BINARY}/electro.obj COPYONLY)
 
 
 set(MUSIC ${CMAKE_CURRENT_SOURCE_DIR}/music)

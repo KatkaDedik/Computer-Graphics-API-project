@@ -106,6 +106,23 @@ Application::Application(size_t initial_width, size_t initial_height) {
   wall.diffuse_color = glm::vec4(1.0f);
   wall.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
 
+  electro.model_matrix = glm::mat4(
+      glm::vec4(0.05f, 0.0f, 0.0f, 0.0f), 
+      glm::vec4(0.0f, 0.05f, 0.0f, 0.0f), 
+      glm::vec4(0.0f, 0.0f, 0.05f, 0.0f),
+      glm::vec4(-10.0f, 3.0f, -5.0f, 1.0f));
+  electro.ambient_color = glm::vec4(0.0f);
+  electro.diffuse_color = glm::vec4(1.0f);
+  electro.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
+
+  car.model_matrix = glm::mat4(
+      glm::vec4(0.06f, 0.0f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.06f, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 0.06f, 0.0f),
+      glm::vec4(5.5f, 2.0f, -9.0f, 1.0f));
+  car.ambient_color = glm::vec4(0.0f);
+  car.diffuse_color = glm::vec4(1.0f);
+  car.specular_color = glm::vec4(0.0f, 0.0f, 0.2f, 8.0f);
 
   for (int i = 0; i < max_teapots; i++) {
     ObjectUBO tp;
@@ -166,6 +183,12 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &piano_buffer);
   glNamedBufferStorage(piano_buffer, sizeof(ObjectUBO), &piano, GL_DYNAMIC_STORAGE_BIT);
 
+  glCreateBuffers(1, &car_buffer);
+  glNamedBufferStorage(car_buffer, sizeof(ObjectUBO), &car, GL_DYNAMIC_STORAGE_BIT);
+
+  glCreateBuffers(1, &electro_buffer);
+  glNamedBufferStorage(electro_buffer, sizeof(ObjectUBO), &electro, GL_DYNAMIC_STORAGE_BIT);
+
   glCreateBuffers(1, &teapot_buffer);
   glNamedBufferStorage(teapot_buffer, sizeof(ObjectUBO) * max_teapots, teapot_ubos.data(), GL_DYNAMIC_STORAGE_BIT);
 
@@ -200,6 +223,10 @@ Application::~Application() {
   glDeleteBuffers(7, clock_buffer.data());
   glDeleteBuffers(1, &cube_man_right_buffer);
   glDeleteBuffers(1, &mdas_buffer);
+  glDeleteBuffers(1, &electro_buffer);
+  glDeleteBuffers(1, &car_buffer);
+  glDeleteBuffers(1, &wall_buffer);
+  glDeleteBuffers(1, &beer_buffer);
 
   glDeleteTextures(1, &black_texture);
   glDeleteTextures(1, &default_texture);
@@ -274,6 +301,16 @@ void Application::render() {
   glBindTextureUnit(0, wall_texture);
   glBindTextureUnit(1, wall_normal_texture);
   wall_mesh.draw();
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, electro_buffer);
+  glBindTextureUnit(0, electro_texture);
+  glBindTextureUnit(1, electro_normal_texture);
+  electro_mesh.draw();
+
+  glUseProgram(draw_object_program);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, car_buffer);
+  car_mesh[0]->draw();
+  car_mesh[1]->draw();
 
   glUseProgram(draw_teapots_program);
   for (size_t i = 0; i < max_teapots; i++) {

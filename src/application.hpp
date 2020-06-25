@@ -189,9 +189,19 @@ private:
   GLuint wall_buffer = 0;
   GLuint wall_texture = load_texture_2d("images/wall.jpg");
   GLuint wall_normal_texture = load_texture_2d("images/wall_normal_map.jpg");
+
+  Mesh electro_mesh = *Mesh::from_file("objects/electro.obj")[0];
+  ObjectUBO electro;
+  GLuint electro_buffer = 0;
+  GLuint electro_texture = load_texture_2d("images/el.jpg");
+  GLuint electro_normal_texture = load_texture_2d("images/el_normal_map.jpg");
   
   ObjectUBO floor_object;
   GLuint floor_object_buffer = 0;
+
+  std::vector<std::unique_ptr<Mesh>> car_mesh = Mesh::from_file("objects/car.obj");
+  ObjectUBO car;
+  GLuint car_buffer = 0;
 
   GLuint teapot_buffer = 0;
 
