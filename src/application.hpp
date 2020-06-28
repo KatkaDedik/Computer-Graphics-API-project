@@ -171,8 +171,7 @@ private:
   Mesh mdas_mesh = *Mesh::from_file("objects/mdas.obj")[0];
   ObjectUBO mdas;
   GLuint mdas_buffer = 0;
-  GLuint mdas_cover_texture = load_texture_2d("objects/cover.jpg");
-  GLuint mdas_pages_texture = load_texture_2d("objects/bookpages.jpg");
+  GLuint mdas_texture = load_texture_2d("images/mdas.jpg");
 
   Mesh piano_mesh = *Mesh::from_file("objects/piano.obj")[0];
   ObjectUBO piano;
@@ -183,7 +182,6 @@ private:
   ObjectUBO beer;
   GLuint beer_buffer = 0;
   GLuint beer_texture = load_texture_2d("objects/beer.jpeg");
-  GLuint beer_normal_texture = load_texture_2d("objects/BeerNormalsMap.jpeg");
 
   Mesh wall_mesh = *Mesh::from_file("objects/wall.obj")[0];
   ObjectUBO wall;

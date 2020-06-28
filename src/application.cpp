@@ -59,8 +59,11 @@ Application::Application(size_t initial_width, size_t initial_height) {
   cube_man_left.diffuse_color = glm::vec4(1.0f);
   cube_man_left.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
 
-  mdas.model_matrix = glm::mat4(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
-                                glm::vec4(5.0f, 5.0f, 5.0f, 1.0f));
+  mdas.model_matrix = glm::mat4(
+      glm::vec4(0.1f, 0.0f, 0.0f, 0.0f), 
+      glm::vec4(0.0f, 0.1f, 0.0f, 0.0f), 
+      glm::vec4(0.0f, 0.0f, 0.1f, 0.0f),
+      glm::vec4(5.0f, 5.0f, 5.0f, 1.0f));
   mdas.ambient_color = glm::vec4(0.0f);
   mdas.diffuse_color = glm::vec4(1.0f);
   mdas.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
@@ -137,6 +140,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
     tp.specular_color = glm::vec4(0.0f, 0.0f, 0.8f, 8.0f);
     teapot_ubos.emplace_back(tp);
     teapot_times.emplace_back(std::chrono::high_resolution_clock::now());
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
   }
 
   // Scatter lights
@@ -286,16 +292,17 @@ void Application::render() {
   glBindTextureUnit(1, floor_normal_map);
   cube.draw();
   
+  //draw_mdas();
   draw_clock();
   draw_executor();
   draw_teapots();
   draw_piano();
   draw_car();
 
+
   glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, beer_buffer);
   glBindTextureUnit(0, beer_texture);
-  glBindTextureUnit(1, beer_normal_texture);
   beer_mesh.draw();
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, wall_buffer);
@@ -455,8 +462,11 @@ void Application::draw_executor() {
   cube_man_right.model_matrix = glm::rotate(cube_man_right.model_matrix, +angle, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void Application::draw_mdas(){
-
+void Application::draw_mdas() { 
+  glUseProgram(draw_object_textured_program);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 2, mdas_buffer);
+  glBindTextureUnit(0, mdas_texture);
+  mdas_mesh.draw();
 }
 
 void Application::draw_piano(){
