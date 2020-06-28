@@ -6,6 +6,15 @@ layout(binding = 0, std140) uniform Camera {
 	vec3 position;
 } camera;
 
+layout(binding = 4, std140) uniform MyFogParameters 
+{
+vec4 color;
+float density;
+float start;
+float end;
+float scale;
+} MyFog;
+
 struct Light {
 	vec4 position;
 	vec4 ambient_color;
@@ -29,6 +38,7 @@ layout(binding = 0) uniform sampler2D diffuse_texture;
 layout(location = 0) in vec3 fs_position;
 layout(location = 1) in vec3 fs_normal;
 layout(location = 2) in vec2 fs_texture_coordinate;
+layout(location = 3) in float fs_fog_factor;
 
 layout(location = 0) out vec4 final_color;
 
@@ -61,5 +71,5 @@ void main()
 		lights_sum += color;
 	}
 
-	final_color = vec4(lights_sum, 1.0);
+	final_color = mix(MyFog.color, vec4(lights_sum, 1.0), fs_fog_factor);
 }

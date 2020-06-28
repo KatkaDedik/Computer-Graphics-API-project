@@ -145,21 +145,20 @@ Application::Application(size_t initial_width, size_t initial_height) {
   }
   
   // Scatter lights
-  for (int x = -10; x < 10; x += 2) {
-    for (int y = -10; y < 10; y += 2) {
-      glm::vec3 color = (glm::vec3(x, y, 0.0f) + 8.0f) / 16.0f;
+  for (int x = 0; x < 10; x += 2) {
+    for (int y = 0; y < 15; y += 2) {
       lights.push_back({
-          glm::vec4(x, 0.40f, y, 1.0f), // position
+          glm::vec4(x - 10, 0.30f, y -20, 1.0f), // position
           glm::vec4(0.0),               // ambient
-          glm::vec4(color, 1.0f),       // diffuse
+          glm::vec4(0.0f, 0.0f, 0.7f, 1.0f),       // diffuse
           glm::vec4(0.0f)               // specular
       });
     }
   }
 
   fog.color = glm::vec4(0.0f, 0.0f, 0.6f, 8.0f);
-  fog.density = 0.03f;
-  fog.start = 0.02f;
+  fog.density = 0.02f;
+  fog.start = 0.05f;
   fog.end = 1.0f;
   fog.scale = 1.5f;
 
