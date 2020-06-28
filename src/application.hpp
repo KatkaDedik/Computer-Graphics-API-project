@@ -63,6 +63,13 @@ struct ObjectUBO {
   glm::vec4 specular_color; // [ 96 - 112) bytes
 };
 
+struct FogUBO {
+  glm::vec4 color;
+  float density;
+  float start;
+  float end;
+  float scale;
+};
 
 
 // ----------------------------------------------------------------------------
@@ -120,6 +127,10 @@ private:
   CameraUBO camera_ubo;
   GLuint camera_buffer = 0;
 
+  //fogUBO
+  FogUBO fog;
+  GLuint fog_buffer = 0;
+
   // ----------------------------------------------------------------------------
   // PROGRAMS
   // ----------------------------------------------------------------------------
@@ -136,7 +147,7 @@ private:
   // SCENES/OBJECTS
   // ----------------------------------------------------------------------------
   Mesh cube = Mesh::cube();
-  Mesh sphere = Mesh::sphere();
+  //Mesh sphere = Mesh::sphere();
   Mesh teapot = Mesh::teapot();
 
   // std::vector<std::unique_ptr<Mesh>> obj_test_scene = Mesh::from_file("objects/test_scene.obj");

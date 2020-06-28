@@ -141,10 +141,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
     teapot_ubos.emplace_back(tp);
     teapot_times.emplace_back(std::chrono::high_resolution_clock::now());
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+   
   }
-
+  
   // Scatter lights
   for (int x = -10; x < 10; x += 2) {
     for (int y = -10; y < 10; y += 2) {
@@ -158,6 +157,13 @@ Application::Application(size_t initial_width, size_t initial_height) {
     }
   }
 
+  fog.color = glm::vec4(0.0f, 0.0f, 0.6f, 8.0f);
+  fog.density = 0.03f;
+  fog.start = 0.02f;
+  fog.end = 1.0f;
+  fog.scale = 1.5f;
+
+
   // --------------------------------------------------------------------------
   // Create Buffers
   // --------------------------------------------------------------------------
@@ -166,6 +172,9 @@ Application::Application(size_t initial_width, size_t initial_height) {
 
   glCreateBuffers(1, &lights_buffer);
   glNamedBufferStorage(lights_buffer, lights.size() * sizeof(LightUBO), lights.data(), GL_DYNAMIC_STORAGE_BIT);
+
+  glCreateBuffers(1, &fog_buffer);
+  glNamedBufferStorage(fog_buffer, sizeof(FogUBO), &fog, GL_DYNAMIC_STORAGE_BIT);
 
   for (size_t i = 0; i < clock.size(); i++) {
     glCreateBuffers(1, &clock_buffer[i]);
@@ -184,7 +193,7 @@ Application::Application(size_t initial_width, size_t initial_height) {
   glCreateBuffers(1, &beer_buffer);
   glNamedBufferStorage(beer_buffer, sizeof(ObjectUBO), &beer, GL_DYNAMIC_STORAGE_BIT);
 
-    glCreateBuffers(1, &wall_buffer);
+  glCreateBuffers(1, &wall_buffer);
   glNamedBufferStorage(wall_buffer, sizeof(ObjectUBO), &wall, GL_DYNAMIC_STORAGE_BIT);
 
   glCreateBuffers(1, &piano_buffer);
@@ -218,6 +227,11 @@ Application::Application(size_t initial_width, size_t initial_height) {
   // Associate color and depth `attachments` with color and depth `textures`
   glNamedFramebufferTexture(postprocess_framebuffer, GL_COLOR_ATTACHMENT0, postprocess_framebuffer_color, 0);
   glNamedFramebufferTexture(postprocess_framebuffer, GL_DEPTH_ATTACHMENT, postprocess_framebuffer_depth, 0);
+
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+
 }
 
 Application::~Application() {
@@ -234,6 +248,7 @@ Application::~Application() {
   glDeleteBuffers(1, &car_buffer);
   glDeleteBuffers(1, &wall_buffer);
   glDeleteBuffers(1, &beer_buffer);
+  glDeleteBuffers(1, &fog_buffer);
 
   glDeleteTextures(1, &black_texture);
   glDeleteTextures(1, &default_texture);
@@ -271,14 +286,15 @@ void Application::render() {
   // Draw the scene
   // --------------------------------------------------------------------------
 
-  // Bind the Framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, postprocess_framebuffer);
   current_color = ((((time_now - begin_time).count() / 1000000) + 700) / 2000) % 4;
+  fog.color = kahoot_colors[current_color];
+  glNamedBufferSubData(fog_buffer, 0, sizeof(FogUBO), &fog);
 
   // Clear attachments
-  glClearNamedFramebufferfv(postprocess_framebuffer, GL_COLOR, 0, (const float *)&kahoot_colors[current_color].data);
-  glClearNamedFramebufferfv(postprocess_framebuffer, GL_DEPTH, 0, clear_depth);
-
+  glClearColor(kahoot_colors[current_color].r, kahoot_colors[current_color].g, kahoot_colors[current_color].b, 1.0f);
+  glClearDepth(static_cast<double>(clear_depth[0]));
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  
   // Configure fixed function pipeline
   glEnable(GL_DEPTH_TEST);
 
@@ -288,6 +304,7 @@ void Application::render() {
   // Draw 
   glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, floor_object_buffer);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   glBindTextureUnit(0, floor_texture);
   glBindTextureUnit(1, floor_normal_map);
   cube.draw();
@@ -302,15 +319,18 @@ void Application::render() {
 
   glUseProgram(draw_object_normal_textured_program);
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, beer_buffer);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   glBindTextureUnit(0, beer_texture);
   beer_mesh.draw();
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, wall_buffer);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   glBindTextureUnit(0, wall_texture);
   glBindTextureUnit(1, wall_normal_texture);
   wall_mesh.draw();
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 2, electro_buffer);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   glBindTextureUnit(0, electro_texture);
   glBindTextureUnit(1, electro_normal_texture);
   electro_mesh.draw();
@@ -332,34 +352,11 @@ void Application::render() {
 
   glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera_buffer);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lights_buffer);
-
-
-  // --------------------------------------------------------------------------
-  // Apply post-process
-  // --------------------------------------------------------------------------
-
-  // Bind back the default framebuffer (0)
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  // Clear color buffer
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  // Set fixed function pipeline
-  glDisable(GL_DEPTH_TEST); // Disable depth test - we do not need it
-  glViewport(0, 0, this->width, this->height);
-
-  // Use post-process program
-  glUseProgram(postprocess_program);
-
-  // Bind the output from previous program as input texture to the post-process program
-  glBindTextureUnit(0, postprocess_framebuffer_color);
-
-  // Draw the full-screen triangle
-  glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 
 void Application::draw_clock() {
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   y_position += direction;
   if (y_position > 2.0f || y_position < 0.0f) {
     direction = -direction;
@@ -377,6 +374,7 @@ void Application::draw_clock() {
 
 void Application::draw_car() {
   glUseProgram(draw_object_program);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   float t = (time_now - begin_time).count() / 1000000000.0f;
   float angle = cosf(t * 3.14 / 2 + 700) * 0.2;
   float x = sinf(angle) * 5.0f;
@@ -439,6 +437,7 @@ void Application::draw_car() {
 
 void Application::draw_executor() {
   glUseProgram(draw_object_normal_textured_program);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_buffer);
   float t = (time_now - begin_time).count() / 1000000000.0f;
   float angle = sinf(t * 3.14 / 2 + 700) * 1.5;
 
