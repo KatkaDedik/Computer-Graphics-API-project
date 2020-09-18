@@ -36,7 +36,7 @@
 const float clear_color[4] = {0.0, 0.0, 0.0, 1.0};
 const float clear_depth[1] = {1.0};
 const int max_teapots = 60;
-const float default_height = 15.0f;
+const float default_height = 20.0f;
 
 // ----------------------------------------------------------------------------
 // UNIFORM STRUCTS
@@ -182,12 +182,7 @@ private:
   Mesh mdas_mesh = *Mesh::from_file("objects/mdas.obj")[0];
   ObjectUBO mdas;
   GLuint mdas_buffer = 0;
-  GLuint mdas_texture = load_texture_2d("images/mdas.jpg");
-
-  Mesh piano_mesh = *Mesh::from_file("objects/piano.obj")[0];
-  ObjectUBO piano;
-  ObjectUBO piano_b;
-  GLuint piano_buffer = 0;
+  GLuint mdas_texture = load_texture_2d("images/cover.jpg");
 
   Mesh beer_mesh = *Mesh::from_file("objects/beer.obj")[0];
   ObjectUBO beer;
@@ -218,7 +213,6 @@ private:
   void draw_clock();
   void draw_executor();
   void draw_mdas();
-  void draw_piano();
   void draw_teapots();
   void draw_car();
   // ----------------------------------------------------------------------------
